@@ -31,7 +31,7 @@ export interface AudioSettings {
   countdownEnabled: boolean;
   wakeLockEnabled: boolean;
   speechRate?: 'normal' | 'fast';
-  language: 'id-ID';
+  language: 'en-US' | 'id-ID';
 }
 
 export interface ExpandedStep {

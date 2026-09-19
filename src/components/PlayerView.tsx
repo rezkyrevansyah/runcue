@@ -107,7 +107,7 @@ export function PlayerView({
       playBeep(1046.5, 0.5);
     }
     if (audioSettings.voiceEnabled) {
-      speakText('Latihan selesai! Kerja bagus.');
+      speakText('Workout complete! Great job.');
     }
 
     const breakdownMap: Record<string, { type: typeof currentStep.type; label: string; totalSeconds: number }> = {};
@@ -270,7 +270,7 @@ export function PlayerView({
       <header className="flex items-center justify-between w-full">
         <div className="flex flex-col">
           <span className="text-[11px] font-bold tracking-wider uppercase text-[#67676F]">
-            Sedang Berlatih
+            Active Workout
           </span>
           <h1 className="text-base font-bold text-[#F5F5F7] tracking-tight line-clamp-1">
             {workout.name}
@@ -281,7 +281,7 @@ export function PlayerView({
           type="button"
           onClick={() => setShowExitConfirm(true)}
           className="w-10 h-10 rounded-full bg-[#18181B] border border-[#2B2B30] text-[#F5F5F7] flex items-center justify-center active:scale-95 transition cursor-pointer"
-          title="Akhiri Sesi"
+          title="End Session"
         >
           <X className="w-5 h-5" />
         </button>
@@ -292,7 +292,7 @@ export function PlayerView({
         <div className="flex items-center justify-between p-3 rounded-2xl bg-[#FFB020]/15 border border-[#FFB020]/30 text-xs text-[#FFB020] animate-in fade-in-50">
           <div className="flex items-center gap-2">
             <AlertTriangle className="w-4 h-4 shrink-0" />
-            <span>Waktu disesuaikan kembali otomatis.</span>
+            <span>Time automatically resynced.</span>
           </div>
           <button type="button" onClick={() => setBackgroundNotice(false)}>
             <X className="w-4 h-4" />
@@ -349,13 +349,13 @@ export function PlayerView({
             {/* Rounds or Progress info */}
             <span className="text-xs font-medium text-[#9B9BA3] mt-1">
               {currentStep.repeatIndex
-                ? `Putaran ${currentStep.repeatIndex} dari ${currentStep.repeatCount}`
-                : `Tahap ${position.stageIndex + 1} dari ${expandedSteps.length}`}
+                ? `Round ${currentStep.repeatIndex} of ${currentStep.repeatCount}`
+                : `Stage ${position.stageIndex + 1} of ${expandedSteps.length}`}
             </span>
 
             {status === 'paused' && (
               <span className="text-[10px] font-bold text-[#FFB020] uppercase tracking-widest animate-pulse mt-0.5">
-                SESI DIJEDA
+                SESSION PAUSED
               </span>
             )}
           </div>
@@ -375,10 +375,10 @@ export function PlayerView({
             </div>
             <div className="flex flex-col">
               <span className="text-[11px] font-medium text-[#67676F] uppercase tracking-wider">
-                Berikutnya
+                Next
               </span>
               <span className="text-sm font-bold text-[#F5F5F7]">
-                {nextStep ? `${nextStep.label} · ${formatTimeMMSS(nextStep.durationSeconds)}` : 'Selesai Latihan'}
+                {nextStep ? `${nextStep.label} · ${formatTimeMMSS(nextStep.durationSeconds)}` : 'Workout Complete'}
               </span>
             </div>
           </div>
@@ -393,7 +393,7 @@ export function PlayerView({
             onClick={handleSkipPrev}
             disabled={position.stageIndex === 0 && position.stageElapsed < 3}
             className="w-14 h-14 rounded-full bg-[#18181B] border border-[#2B2B30] text-[#F5F5F7] hover:bg-[#232327] flex items-center justify-center active:scale-95 transition cursor-pointer disabled:opacity-30"
-            title="Tahap Sebelumnya"
+            title="Previous Stage"
           >
             <SkipBack className="w-6 h-6" />
           </button>
@@ -404,7 +404,7 @@ export function PlayerView({
               type="button"
               onClick={handlePause}
               className="w-20 h-20 rounded-full bg-[#D6FE3E] hover:bg-[#c9f62c] text-[#111108] flex items-center justify-center shadow-lg shadow-[#D6FE3E]/20 active:scale-95 transition cursor-pointer select-none"
-              title="Jeda"
+              title="Pause"
             >
               <Pause className="w-8 h-8 fill-current" />
             </button>
@@ -413,7 +413,7 @@ export function PlayerView({
               type="button"
               onClick={handleResume}
               className="w-20 h-20 rounded-full bg-[#D6FE3E] hover:bg-[#c9f62c] text-[#111108] flex items-center justify-center shadow-lg shadow-[#D6FE3E]/20 active:scale-95 transition cursor-pointer select-none"
-              title="Lanjut"
+              title="Resume"
             >
               <Play className="w-8 h-8 fill-current ml-1" />
             </button>
@@ -424,7 +424,7 @@ export function PlayerView({
             type="button"
             onClick={handleSkipNext}
             className="w-14 h-14 rounded-full bg-[#18181B] border border-[#2B2B30] text-[#F5F5F7] hover:bg-[#232327] flex items-center justify-center active:scale-95 transition cursor-pointer"
-            title="Tahap Berikutnya"
+            title="Next Stage"
           >
             <SkipForward className="w-6 h-6" />
           </button>
@@ -437,7 +437,7 @@ export function PlayerView({
             onClick={() => setShowExitConfirm(true)}
             className="text-sm font-bold text-[#FF5A52] hover:underline cursor-pointer py-1"
           >
-            Akhiri Sesi
+            End Session
           </button>
         </div>
       </section>
@@ -446,9 +446,9 @@ export function PlayerView({
       {showExitConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs">
           <div className="w-full max-w-sm bg-[#18181B] rounded-3xl p-6 shadow-2xl border border-[#2B2B30] flex flex-col gap-4 animate-in fade-in-50 zoom-in-95">
-            <h3 className="text-base font-bold text-[#F5F5F7]">Akhiri Latihan?</h3>
+            <h3 className="text-base font-bold text-[#F5F5F7]">End Workout?</h3>
             <p className="text-xs text-[#9B9BA3] leading-relaxed">
-              Sesi akan dihentikan dan progres Anda akan disimpan ke ringkasan latihan.
+              Your workout will stop and your progress will be saved in the summary.
             </p>
             <div className="grid grid-cols-2 gap-3 pt-2">
               <button
@@ -456,14 +456,14 @@ export function PlayerView({
                 onClick={() => setShowExitConfirm(false)}
                 className="h-11 rounded-full bg-[#232327] hover:bg-[#2B2B30] text-[#F5F5F7] font-semibold text-sm active:scale-95 transition cursor-pointer"
               >
-                Lanjutkan
+                Resume
               </button>
               <button
                 type="button"
                 onClick={handleConfirmExit}
                 className="h-11 rounded-full bg-[#FF5A52] hover:bg-[#f0453d] text-white font-semibold text-sm active:scale-95 transition cursor-pointer shadow-sm shadow-red-500/20"
               >
-                Akhiri
+                End
               </button>
             </div>
           </div>

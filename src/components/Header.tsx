@@ -34,7 +34,7 @@ export function Header() {
           type="button"
           onClick={() => setShowInfo(true)}
           className="flex items-center justify-center w-11 h-11 rounded-2xl bg-white border border-slate-200/80 text-slate-600 hover:text-slate-900 hover:bg-slate-50 active:scale-95 transition shadow-2xs cursor-pointer"
-          aria-label="Tentang RunCue"
+          aria-label="About RunCue"
         >
           <Info className="w-5 h-5" />
         </button>
@@ -72,7 +72,7 @@ export function Header() {
             </div>
 
             <p className="text-xs text-slate-500 leading-relaxed">
-              Panduan interval lari & jalan dengan suara Bahasa Indonesia. Tanpa akun, 100% tersimpan di perangkat.
+              Interval running and walking audio cues. No accounts needed, 100% saved locally on your device.
             </p>
 
             <button
@@ -80,7 +80,7 @@ export function Header() {
               onClick={() => setShowInfo(false)}
               className="w-full h-12 rounded-xl bg-slate-100 hover:bg-slate-200/80 text-slate-800 font-semibold text-sm active:scale-[0.98] transition cursor-pointer"
             >
-              Tutup
+              Close
             </button>
           </div>
         </div>

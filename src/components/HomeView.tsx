@@ -16,7 +16,11 @@ import {
   Flame,
   Trash2,
   Copy,
+  Download,
+  X,
 } from 'lucide-react';
+import { usePwaInstall } from '@/hooks/usePwaInstall';
+import { InstallGuideModal } from '@/components/InstallGuideModal';
 
 interface HomeViewProps {
   workouts: Workout[];
@@ -36,6 +40,17 @@ export function HomeView({
   onDuplicateWorkout,
 }: HomeViewProps) {
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [bannerDismissed, setBannerDismissed] = useState(false);
+  const [showInstallGuide, setShowInstallGuide] = useState(false);
+  const { isInstalled, hasNativePrompt, triggerInstall } = usePwaInstall();
+
+  const handleInstallClick = async () => {
+    if (hasNativePrompt) {
+      await triggerInstall();
+    } else {
+      setShowInstallGuide(true);
+    }
+  };
 
   const defaultWorkout = workouts[0];
   const defaultTotalSec = defaultWorkout ? calculateTotalDuration(defaultWorkout) : 0;
@@ -74,7 +89,7 @@ export function HomeView({
             </span>
           </div>
           <span className="text-xs font-medium text-[#9B9BA3] mt-0.5">
-            Hai, Pagi ini lari?
+            Hey, ready to run today?
           </span>
         </div>
 
@@ -84,12 +99,48 @@ export function HomeView({
         </div>
       </header>
 
-      {/* Featured Card (CONTOH LATIHAN) */}
+      {/* PWA Install Banner (When not in standalone mode) */}
+      {!isInstalled && !bannerDismissed && (
+        <div className="flex items-center justify-between p-3 sm:p-3.5 rounded-2xl bg-[#18181B] border border-[#D6FE3E]/30 shadow-lg animate-in fade-in-50">
+          <div className="flex items-center gap-3 min-w-0 pr-2">
+            <div className="w-8 h-8 rounded-xl bg-[#D6FE3E] text-[#111108] flex items-center justify-center shrink-0">
+              <Download className="w-4 h-4 stroke-[2.5]" />
+            </div>
+            <div className="flex flex-col min-w-0">
+              <span className="font-bold text-xs text-[#F5F5F7]">
+                Install to Home Screen
+              </span>
+              <span className="text-[11px] text-[#9B9BA3] truncate">
+                Instant access without browser & 100% offline
+              </span>
+            </div>
+          </div>
+          <div className="flex items-center gap-1.5 shrink-0">
+            <button
+              type="button"
+              onClick={handleInstallClick}
+              className="h-8 px-3 rounded-full bg-[#D6FE3E] hover:bg-[#c9f62c] text-[#111108] text-xs font-black active:scale-95 transition cursor-pointer"
+            >
+              Install
+            </button>
+            <button
+              type="button"
+              onClick={() => setBannerDismissed(true)}
+              className="w-7 h-7 rounded-lg flex items-center justify-center text-[#67676F] hover:text-[#F5F5F7] cursor-pointer"
+              title="Dismiss banner"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Featured Card (FEATURED WORKOUT) */}
       {defaultWorkout && (
         <section className="flex flex-col gap-4 p-5 sm:p-6 rounded-3xl bg-[#232327] border border-[#2B2B30] shadow-xl">
           <div className="flex items-center justify-between">
             <div className="px-3 py-1 rounded-full bg-[#D6FE3E] text-[#111108] text-[11px] font-black tracking-wider uppercase">
-              Contoh Latihan
+              Featured Workout
             </div>
             <button
               type="button"
@@ -105,7 +156,7 @@ export function HomeView({
               {defaultWorkout.name}
             </h2>
             <p className="text-xs text-[#9B9BA3] line-clamp-1 leading-relaxed">
-              Pemanasan 5:00 → Lari 1:00 / Jalan 2:00 × 8 → Pendinginan 5:00
+              Warmup 5:00 → Run 1:00 / Walk 2:00 × 8 → Cooldown 5:00
             </p>
           </div>
 
@@ -121,33 +172,33 @@ export function HomeView({
               <span className="text-lg font-black text-[#F5F5F7] tabular-nums">
                 {defaultExpanded.length}
               </span>
-              <span className="text-[11px] font-medium text-[#9B9BA3]">Tahap</span>
+              <span className="text-[11px] font-medium text-[#9B9BA3]">Stages</span>
             </div>
             <div className="flex flex-col py-1.5">
               <span className="text-lg font-black text-[#F5F5F7]">
                 × 8
               </span>
-              <span className="text-[11px] font-medium text-[#9B9BA3]">Putaran</span>
+              <span className="text-[11px] font-medium text-[#9B9BA3]">Rounds</span>
             </div>
           </div>
 
-          {/* PrimaryButton Mulai Latihan Ini */}
+          {/* PrimaryButton Start This Workout */}
           <button
             type="button"
             onClick={() => onSelectWorkout(defaultWorkout)}
             className="w-full h-13 rounded-full bg-[#D6FE3E] hover:bg-[#c9f62c] active:scale-[0.98] text-[#111108] font-black text-sm tracking-wide flex items-center justify-center gap-2 shadow-lg shadow-[#D6FE3E]/15 transition cursor-pointer select-none"
           >
             <Play className="w-4 h-4 fill-current ml-0.5" />
-            <span>Mulai Latihan Ini</span>
+            <span>Start This Workout</span>
           </button>
         </section>
       )}
 
-      {/* Preset Tersimpan Section */}
+      {/* Saved Presets Section */}
       <section className="flex flex-col gap-3">
         <div className="flex items-center justify-between px-1">
           <h3 className="text-base font-bold text-[#F5F5F7]">
-            Preset Tersimpan
+            Saved Workouts
           </h3>
           <button
             type="button"
@@ -155,13 +206,13 @@ export function HomeView({
             className="flex items-center gap-1 text-xs font-bold text-[#D6FE3E] hover:underline cursor-pointer"
           >
             <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
-            <span>Buat Latihan</span>
+            <span>New Workout</span>
           </button>
         </div>
 
         {workouts.length === 0 ? (
           <div className="p-8 rounded-2xl bg-[#18181B] border border-[#2B2B30] text-center text-xs text-[#9B9BA3]">
-            Belum ada latihan tersimpan. Buat latihan baru di atas.
+            No saved workouts. Create a new workout above.
           </div>
         ) : (
           <div className="flex flex-col gap-2.5">
@@ -189,7 +240,7 @@ export function HomeView({
                       <div className="flex items-center gap-1.5 text-xs text-[#9B9BA3]">
                         <span className="tabular-nums font-medium">{formatTimeMMSS(totalSec)}</span>
                         <span>·</span>
-                        <span>{exp.length} tahap</span>
+                        <span>{exp.length} stages</span>
                       </div>
                     </div>
                   </div>
@@ -200,7 +251,7 @@ export function HomeView({
                       type="button"
                       onClick={() => onDuplicateWorkout(w)}
                       className="w-8 h-8 rounded-xl flex items-center justify-center text-[#67676F] hover:text-[#F5F5F7] hover:bg-[#232327] transition cursor-pointer"
-                      title="Duplikasi"
+                      title="Duplicate"
                     >
                       <Copy className="w-3.5 h-3.5" />
                     </button>
@@ -208,7 +259,7 @@ export function HomeView({
                       type="button"
                       onClick={() => onEditWorkout(w)}
                       className="w-8 h-8 rounded-xl flex items-center justify-center text-[#67676F] hover:text-[#F5F5F7] hover:bg-[#232327] transition cursor-pointer"
-                      title="Ubah Latihan"
+                      title="Edit Workout"
                     >
                       <SlidersHorizontal className="w-3.5 h-3.5" />
                     </button>
@@ -217,7 +268,7 @@ export function HomeView({
                         type="button"
                         onClick={() => setDeleteConfirmId(w.id)}
                         className="w-8 h-8 rounded-xl flex items-center justify-center text-[#67676F] hover:text-[#FF5A52] hover:bg-[#232327] transition cursor-pointer"
-                        title="Hapus"
+                        title="Delete"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -226,7 +277,7 @@ export function HomeView({
                       type="button"
                       onClick={() => onSelectWorkout(w)}
                       className="w-10 h-10 rounded-full bg-[#232327] hover:bg-[#D6FE3E] hover:text-[#111108] text-[#F5F5F7] flex items-center justify-center transition ml-1 cursor-pointer active:scale-95 shadow-xs"
-                      title="Mulai Latihan"
+                      title="Start Workout"
                     >
                       <Play className="w-4 h-4 fill-current ml-0.5" />
                     </button>
@@ -242,9 +293,9 @@ export function HomeView({
       {deleteConfirmId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-xs">
           <div className="w-full max-w-sm bg-[#18181B] rounded-3xl p-6 shadow-2xl border border-[#2B2B30] flex flex-col gap-4 animate-in fade-in-50 zoom-in-95">
-            <h3 className="text-base font-bold text-[#F5F5F7]">Hapus Latihan?</h3>
+            <h3 className="text-base font-bold text-[#F5F5F7]">Delete Workout?</h3>
             <p className="text-xs text-[#9B9BA3] leading-relaxed">
-              Latihan akan dihapus permanen dari perangkat Anda.
+              This workout will be permanently removed from your device.
             </p>
             <div className="grid grid-cols-2 gap-3 pt-2">
               <button
@@ -252,7 +303,7 @@ export function HomeView({
                 onClick={() => setDeleteConfirmId(null)}
                 className="h-11 rounded-full bg-[#232327] hover:bg-[#2B2B30] text-[#F5F5F7] font-semibold text-sm active:scale-95 transition cursor-pointer"
               >
-                Batal
+                Cancel
               </button>
               <button
                 type="button"
@@ -262,11 +313,16 @@ export function HomeView({
                 }}
                 className="h-11 rounded-full bg-[#FF5A52] hover:bg-[#f0453d] text-white font-semibold text-sm active:scale-95 transition cursor-pointer shadow-sm shadow-red-500/20"
               >
-                Hapus
+                Delete
               </button>
             </div>
           </div>
         </div>
+      )}
+
+      {/* PWA Install Guide Modal */}
+      {showInstallGuide && (
+        <InstallGuideModal onClose={() => setShowInstallGuide(false)} />
       )}
     </div>
   );

@@ -27,10 +27,10 @@ export function SummaryView({ summary, workout, onRepeat, onHome }: SummaryViewP
 
           <div className="flex flex-col gap-1">
             <h1 className="text-3xl font-black text-[#F5F5F7] tracking-tight">
-              Latihan Selesai!
+              Workout Complete!
             </h1>
             <p className="text-xs text-[#9B9BA3] font-medium">
-              {summary.workoutName} · Status: {isFullyCompleted ? 'Selesai' : 'Sebagian'}
+              {summary.workoutName} · Status: {isFullyCompleted ? 'Completed' : 'Partial'}
             </p>
           </div>
         </section>
@@ -43,7 +43,7 @@ export function SummaryView({ summary, workout, onRepeat, onHome }: SummaryViewP
               <span className="text-2xl font-black text-[#F5F5F7] tabular-nums mt-0.5">
                 {formatTimeMMSS(summary.plannedDurationSeconds)}
               </span>
-              <span className="text-xs text-[#9B9BA3]">Waktu Terencana</span>
+              <span className="text-xs text-[#9B9BA3]">Planned Time</span>
             </div>
 
             <div className="flex flex-col gap-1.5 p-4 rounded-2xl bg-[#18181B] border border-[#2B2B30]">
@@ -51,7 +51,7 @@ export function SummaryView({ summary, workout, onRepeat, onHome }: SummaryViewP
               <span className="text-2xl font-black text-[#F5F5F7] tabular-nums mt-0.5">
                 {formatTimeMMSS(summary.activeDurationSeconds)}
               </span>
-              <span className="text-xs text-[#9B9BA3]">Waktu Aktif</span>
+              <span className="text-xs text-[#9B9BA3]">Active Time</span>
             </div>
           </div>
 
@@ -60,12 +60,12 @@ export function SummaryView({ summary, workout, onRepeat, onHome }: SummaryViewP
             <CheckCircle2 className="w-6 h-6 text-[#CFFF04] shrink-0" />
             <div className="flex flex-col">
               <span className="text-sm font-bold text-[#F5F5F7]">
-                {summary.completedStages} dari {summary.totalStages} tahap tuntas
+                {summary.completedStages} of {summary.totalStages} stages completed
               </span>
               <span className="text-xs text-[#9B9BA3]">
                 {isFullyCompleted
-                  ? 'Semua cue terdengar tepat waktu'
-                  : 'Sebagian latihan telah terselesaikan'}
+                  ? 'All cues delivered on time'
+                  : 'Workout partially completed'}
               </span>
             </div>
           </div>
@@ -80,7 +80,7 @@ export function SummaryView({ summary, workout, onRepeat, onHome }: SummaryViewP
           className="w-full h-13 rounded-full bg-[#D6FE3E] hover:bg-[#c9f62c] text-[#111108] font-black text-sm flex items-center justify-center gap-2 active:scale-95 transition cursor-pointer shadow-lg shadow-[#D6FE3E]/15"
         >
           <RotateCcw className="w-4 h-4 stroke-[2.5]" />
-          <span>Ulangi Latihan</span>
+          <span>Repeat Workout</span>
         </button>
 
         <button
@@ -89,7 +89,7 @@ export function SummaryView({ summary, workout, onRepeat, onHome }: SummaryViewP
           className="w-full h-13 rounded-full bg-[#18181B] hover:bg-[#232327] border border-[#2B2B30] text-[#F5F5F7] font-bold text-sm flex items-center justify-center gap-2 active:scale-95 transition cursor-pointer"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Kembali ke Daftar</span>
+          <span>Back to Workouts</span>
         </button>
       </section>
     </div>

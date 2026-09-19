@@ -4,7 +4,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: 'RunCue - Interval Running & Walking',
     short_name: 'RunCue',
-    description: 'Aplikasi latihan interval lari & jalan dengan pemandu audio otomatis Bahasa Indonesia. 100% offline & lokal.',
+    description: 'Interval running and walking workout timer with automated voice cues. 100% offline and local.',
     start_url: '/',
     display: 'standalone',
     orientation: 'portrait',

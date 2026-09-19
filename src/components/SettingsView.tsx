@@ -19,23 +19,44 @@ import {
   Headphones,
   Sliders,
   CheckCircle2,
+  Download,
+  Share,
+  PlusSquare,
 } from 'lucide-react';
+import { usePwaInstall } from '@/hooks/usePwaInstall';
+import { InstallGuideModal } from '@/components/InstallGuideModal';
 
 interface SettingsViewProps {
   audioSettings: AudioSettings;
   onUpdateSettings: (settings: AudioSettings) => void;
 }
 
-type ModalType = 'wakeLock' | 'privacy' | 'help' | null;
+type ModalType = 'wakeLock' | 'privacy' | 'help' | 'installPwa' | null;
 
 export function SettingsView({ audioSettings, onUpdateSettings }: SettingsViewProps) {
   const [testPlaying, setTestPlaying] = useState(false);
   const [activeModal, setActiveModal] = useState<ModalType>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const { isInstalled, hasNativePrompt, isIos, triggerInstall } = usePwaInstall();
 
   const showToast = (msg: string) => {
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 2500);
+  };
+
+  const handleInstallClick = async () => {
+    if (isInstalled) {
+      showToast('RunCue is already installed on your Home Screen');
+      return;
+    }
+    if (hasNativePrompt) {
+      const outcome = await triggerInstall();
+      if (outcome === 'accepted') {
+        showToast('Successfully added to Home Screen!');
+      }
+    } else {
+      setActiveModal('installPwa');
+    }
   };
 
   const toggleSetting = (key: keyof AudioSettings) => {
@@ -54,7 +75,7 @@ export function SettingsView({ audioSettings, onUpdateSettings }: SettingsViewPr
       ...audioSettings,
       speechRate: nextRate,
     });
-    showToast(`Kecepatan bicara: ${nextRate === 'fast' ? 'Cepat' : 'Normal'}`);
+    showToast(`Speech rate: ${nextRate === 'fast' ? 'Fast (1.2×)' : 'Normal (1.0×)'}`);
   };
 
   const handleTestAudio = async () => {
@@ -65,10 +86,10 @@ export function SettingsView({ audioSettings, onUpdateSettings }: SettingsViewPr
       playBeep(880, 0.2);
     }
     if (audioSettings.voiceEnabled) {
-      await speakText('Tes audio RunCue siap digunakan.', audioSettings.speechRate || 'normal');
+      await speakText('RunCue audio test ready.', audioSettings.speechRate || 'normal');
     }
     setTestPlaying(false);
-    showToast('Tes audio selesai');
+    showToast('Audio test completed');
   };
 
   return (
@@ -83,26 +104,26 @@ export function SettingsView({ audioSettings, onUpdateSettings }: SettingsViewPr
       {/* Screen Title */}
       <div>
         <h1 className="text-2xl font-black tracking-tight text-[#F5F5F7]">
-          Pengaturan
+          Settings
         </h1>
         <p className="text-xs text-[#9B9BA3] mt-0.5">
-          Sesuaikan suara audio dan preferensi latihan
+          Customize audio cues and workout preferences
         </p>
       </div>
 
       {/* SECTION 1: AUDIO */}
       <section className="flex flex-col gap-2">
         <span className="text-[11px] font-bold tracking-wider text-[#67676F] uppercase px-1">
-          Audio & Notifikasi Suara
+          Audio & Voice Cues
         </span>
         <div className="flex flex-col rounded-2xl bg-[#18181B] border border-[#2B2B30] overflow-hidden divide-y divide-[#2B2B30]">
-          {/* Suara Panduan TTS */}
+          {/* Voice Guidance TTS */}
           <div className="flex items-center justify-between p-4 hover:bg-[#232327]/60 transition">
             <div className="flex items-center gap-3">
               <Volume2 className="w-5 h-5 text-[#9B9BA3]" />
               <div className="flex flex-col">
-                <span className="text-sm font-semibold text-[#F5F5F7]">Panduan Suara (TTS)</span>
-                <span className="text-[11px] text-[#9B9BA3]">Instruksi perpindahan tahap</span>
+                <span className="text-sm font-semibold text-[#F5F5F7]">Voice Guidance (TTS)</span>
+                <span className="text-[11px] text-[#9B9BA3]">Spoken instructions for stage transitions</span>
               </div>
             </div>
             <button
@@ -120,7 +141,7 @@ export function SettingsView({ audioSettings, onUpdateSettings }: SettingsViewPr
             </button>
           </div>
 
-          {/* Kecepatan Bicara */}
+          {/* Speech Rate */}
           <button
             type="button"
             onClick={handleToggleRate}
@@ -129,25 +150,25 @@ export function SettingsView({ audioSettings, onUpdateSettings }: SettingsViewPr
             <div className="flex items-center gap-3">
               <Gauge className="w-5 h-5 text-[#9B9BA3]" />
               <div className="flex flex-col">
-                <span className="text-sm font-semibold text-[#F5F5F7]">Kecepatan Bicara</span>
+                <span className="text-sm font-semibold text-[#F5F5F7]">Speech Rate</span>
                 <span className="text-[11px] text-[#9B9BA3]">
-                  {audioSettings.speechRate === 'fast' ? '1.2× (Cepat)' : '1.0× (Normal)'}
+                  {audioSettings.speechRate === 'fast' ? '1.2× (Fast)' : '1.0× (Normal)'}
                 </span>
               </div>
             </div>
             <div className="flex items-center gap-1.5 text-xs text-[#D6FE3E] font-bold">
-              <span className="capitalize">{audioSettings.speechRate === 'fast' ? 'Cepat' : 'Normal'}</span>
+              <span className="capitalize">{audioSettings.speechRate === 'fast' ? 'Fast' : 'Normal'}</span>
               <ChevronRight className="w-4 h-4 text-[#67676F]" />
             </div>
           </button>
 
-          {/* Bunyi Beep Transisi */}
+          {/* Transition Beeps */}
           <div className="flex items-center justify-between p-4 hover:bg-[#232327]/60 transition">
             <div className="flex items-center gap-3">
               <Sliders className="w-5 h-5 text-[#9B9BA3]" />
               <div className="flex flex-col">
-                <span className="text-sm font-semibold text-[#F5F5F7]">Bunyi Beep Transisi</span>
-                <span className="text-[11px] text-[#9B9BA3]">Bunyi nada saat tahap berganti</span>
+                <span className="text-sm font-semibold text-[#F5F5F7]">Transition Beeps</span>
+                <span className="text-[11px] text-[#9B9BA3]">Audio chime when stages transition</span>
               </div>
             </div>
             <button
@@ -165,13 +186,13 @@ export function SettingsView({ audioSettings, onUpdateSettings }: SettingsViewPr
             </button>
           </div>
 
-          {/* Hitung Mundur 3-2-1 */}
+          {/* 3-2-1 Countdown Beeps */}
           <div className="flex items-center justify-between p-4 hover:bg-[#232327]/60 transition">
             <div className="flex items-center gap-3">
               <Ear className="w-5 h-5 text-[#9B9BA3]" />
               <div className="flex flex-col">
-                <span className="text-sm font-semibold text-[#F5F5F7]">Hitung Mundur 3-2-1</span>
-                <span className="text-[11px] text-[#9B9BA3]">Beep pada 3 detik terakhir tahap</span>
+                <span className="text-sm font-semibold text-[#F5F5F7]">3-2-1 Countdown Beeps</span>
+                <span className="text-[11px] text-[#9B9BA3]">Beeps during the final 3 seconds of a stage</span>
               </div>
             </div>
             <button
@@ -189,13 +210,13 @@ export function SettingsView({ audioSettings, onUpdateSettings }: SettingsViewPr
             </button>
           </div>
 
-          {/* Layar Tetap Aktif */}
+          {/* Keep Screen Awake */}
           <div className="flex items-center justify-between p-4 hover:bg-[#232327]/60 transition">
             <div className="flex items-center gap-3">
               <Smartphone className="w-5 h-5 text-[#9B9BA3]" />
               <div className="flex flex-col">
-                <span className="text-sm font-semibold text-[#F5F5F7]">Layar Tetap Aktif</span>
-                <span className="text-[11px] text-[#9B9BA3]">Cegah layar mati saat latihan (WakeLock)</span>
+                <span className="text-sm font-semibold text-[#F5F5F7]">Keep Screen Awake</span>
+                <span className="text-[11px] text-[#9B9BA3]">Prevent screen from sleeping during workouts (WakeLock)</span>
               </div>
             </div>
             <button
@@ -213,7 +234,7 @@ export function SettingsView({ audioSettings, onUpdateSettings }: SettingsViewPr
             </button>
           </div>
 
-          {/* Tes Suara & Bunyi Button */}
+          {/* Test Voice & Beep Button */}
           <button
             type="button"
             onClick={handleTestAudio}
@@ -223,31 +244,51 @@ export function SettingsView({ audioSettings, onUpdateSettings }: SettingsViewPr
             <div className="flex items-center gap-3">
               <Ear className="w-5 h-5 text-[#D6FE3E]" />
               <div className="flex flex-col">
-                <span className="text-sm font-bold text-[#F5F5F7]">Tes Suara & Bunyi</span>
-                <span className="text-[11px] text-[#9B9BA3]">Uji keluaran speaker atau earphone</span>
+                <span className="text-sm font-bold text-[#F5F5F7]">Test Voice & Beep</span>
+                <span className="text-[11px] text-[#9B9BA3]">Check speaker or earphone output</span>
               </div>
             </div>
             <div className="flex items-center gap-1.5 text-xs text-[#D6FE3E] font-bold">
-              <span>{testPlaying ? 'Memutar...' : 'Putar Tes'}</span>
+              <span>{testPlaying ? 'Playing...' : 'Play Test'}</span>
               <ChevronRight className="w-4 h-4 text-[#67676F]" />
             </div>
           </button>
         </div>
       </section>
 
-      {/* SECTION 2: UMUM */}
+      {/* SECTION 2: GENERAL */}
       <section className="flex flex-col gap-2">
         <span className="text-[11px] font-bold tracking-wider text-[#67676F] uppercase px-1">
-          Umum & Perangkat
+          General & Device
         </span>
         <div className="flex flex-col rounded-2xl bg-[#18181B] border border-[#2B2B30] overflow-hidden divide-y divide-[#2B2B30]">
           <div className="flex items-center justify-between p-4 hover:bg-[#232327]/60 transition">
             <div className="flex items-center gap-3">
               <Languages className="w-5 h-5 text-[#9B9BA3]" />
-              <span className="text-sm font-semibold text-[#F5F5F7]">Bahasa Aplikasi</span>
+              <span className="text-sm font-semibold text-[#F5F5F7]">App Language</span>
             </div>
-            <span className="text-xs text-[#9B9BA3] font-medium">Bahasa Indonesia</span>
+            <span className="text-xs text-[#9B9BA3] font-medium">English</span>
           </div>
+
+          <button
+            type="button"
+            onClick={handleInstallClick}
+            className="flex items-center justify-between p-4 hover:bg-[#232327]/60 transition text-left cursor-pointer"
+          >
+            <div className="flex items-center gap-3">
+              <Download className="w-5 h-5 text-[#D6FE3E]" />
+              <div className="flex flex-col">
+                <span className="text-sm font-bold text-[#F5F5F7]">Add to Home Screen</span>
+                <span className="text-[11px] text-[#9B9BA3]">
+                  {isInstalled ? 'Already installed on this device' : 'Instant launch, full screen & 100% offline'}
+                </span>
+              </div>
+            </div>
+            <div className="flex items-center gap-1.5 text-xs text-[#D6FE3E] font-bold">
+              <span>{isInstalled ? 'Installed ✓' : 'Install'}</span>
+              <ChevronRight className="w-4 h-4 text-[#67676F]" />
+            </div>
+          </button>
 
           <button
             type="button"
@@ -256,17 +297,17 @@ export function SettingsView({ audioSettings, onUpdateSettings }: SettingsViewPr
           >
             <div className="flex items-center gap-3">
               <Lock className="w-5 h-5 text-[#9B9BA3]" />
-              <span className="text-sm font-semibold text-[#F5F5F7]">Cara Kerja Layar Terkunci</span>
+              <span className="text-sm font-semibold text-[#F5F5F7]">Lock Screen & Background Audio</span>
             </div>
             <ChevronRight className="w-4 h-4 text-[#67676F]" />
           </button>
         </div>
       </section>
 
-      {/* SECTION 3: TENTANG */}
+      {/* SECTION 3: ABOUT */}
       <section className="flex flex-col gap-2">
         <span className="text-[11px] font-bold tracking-wider text-[#67676F] uppercase px-1">
-          Tentang & Bantuan
+          About & Help
         </span>
         <div className="flex flex-col rounded-2xl bg-[#18181B] border border-[#2B2B30] overflow-hidden divide-y divide-[#2B2B30]">
           <button
@@ -276,7 +317,7 @@ export function SettingsView({ audioSettings, onUpdateSettings }: SettingsViewPr
           >
             <div className="flex items-center gap-3">
               <Shield className="w-5 h-5 text-[#9B9BA3]" />
-              <span className="text-sm font-semibold text-[#F5F5F7]">Kebijakan Privasi</span>
+              <span className="text-sm font-semibold text-[#F5F5F7]">Privacy Policy</span>
             </div>
             <ChevronRight className="w-4 h-4 text-[#67676F]" />
           </button>
@@ -288,7 +329,7 @@ export function SettingsView({ audioSettings, onUpdateSettings }: SettingsViewPr
           >
             <div className="flex items-center gap-3">
               <LifeBuoy className="w-5 h-5 text-[#9B9BA3]" />
-              <span className="text-sm font-semibold text-[#F5F5F7]">Bantuan & Masukan</span>
+              <span className="text-sm font-semibold text-[#F5F5F7]">Help & Feedback</span>
             </div>
             <ChevronRight className="w-4 h-4 text-[#67676F]" />
           </button>
@@ -296,21 +337,21 @@ export function SettingsView({ audioSettings, onUpdateSettings }: SettingsViewPr
           <div className="flex items-center justify-between p-4 hover:bg-[#232327]/60 transition">
             <div className="flex items-center gap-3">
               <Info className="w-5 h-5 text-[#9B9BA3]" />
-              <span className="text-sm font-semibold text-[#F5F5F7]">Versi Aplikasi</span>
+              <span className="text-sm font-semibold text-[#F5F5F7]">App Version</span>
             </div>
             <span className="text-xs text-[#9B9BA3] font-mono">v1.0.0 (PWA Offline)</span>
           </div>
         </div>
       </section>
 
-      {/* MODAL: Cara Kerja Layar Terkunci */}
+      {/* MODAL: Lock Screen & Background Audio */}
       {activeModal === 'wakeLock' && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs">
           <div className="w-full max-w-sm bg-[#18181B] rounded-3xl p-6 shadow-2xl border border-[#2B2B30] flex flex-col gap-4 animate-in fade-in-50 zoom-in-95">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <Lock className="w-5 h-5 text-[#D6FE3E]" />
-                <h3 className="text-base font-bold text-[#F5F5F7]">Layar & Audio</h3>
+                <h3 className="text-base font-bold text-[#F5F5F7]">Lock Screen & Audio</h3>
               </div>
               <button
                 type="button"
@@ -324,11 +365,11 @@ export function SettingsView({ audioSettings, onUpdateSettings }: SettingsViewPr
             <div className="flex flex-col gap-3 text-xs text-[#9B9BA3] leading-relaxed">
               <div className="p-3 rounded-2xl bg-[#232327] border border-[#2B2B30]">
                 <span className="font-bold text-[#F5F5F7] block mb-1">Screen WakeLock</span>
-                Fitur ini menjaga layar ponsel Anda tetap menyala selama sesi latihan berjalan, sehingga Anda tidak perlu terus mengetuk layar.
+                Keeps your screen on during an active workout so you never have to tap to wake.
               </div>
               <div className="p-3 rounded-2xl bg-[#232327] border border-[#2B2B30]">
-                <span className="font-bold text-[#F5F5F7] block mb-1">Penggunaan Headset / Earphone</span>
-                Jika Anda memasukkan HP ke saku, gunakan earphone. Suara pemandu tetap terdengar saat layar mati atau aplikasi berjalan di latar.
+                <span className="font-bold text-[#F5F5F7] block mb-1">Earphones & Pocket Mode</span>
+                When placing your phone in your pocket or when the display turns off, voice cues and beeps will continue through your earphones seamlessly.
               </div>
             </div>
 
@@ -337,20 +378,20 @@ export function SettingsView({ audioSettings, onUpdateSettings }: SettingsViewPr
               onClick={() => setActiveModal(null)}
               className="w-full h-11 rounded-full bg-[#D6FE3E] text-[#111108] font-bold text-xs cursor-pointer mt-1"
             >
-              Mengerti
+              Got It
             </button>
           </div>
         </div>
       )}
 
-      {/* MODAL: Kebijakan Privasi */}
+      {/* MODAL: Privacy Policy */}
       {activeModal === 'privacy' && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs">
           <div className="w-full max-w-sm bg-[#18181B] rounded-3xl p-6 shadow-2xl border border-[#2B2B30] flex flex-col gap-4 animate-in fade-in-50 zoom-in-95">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <Shield className="w-5 h-5 text-[#D6FE3E]" />
-                <h3 className="text-base font-bold text-[#F5F5F7]">Kebijakan Privasi</h3>
+                <h3 className="text-base font-bold text-[#F5F5F7]">Privacy Policy</h3>
               </div>
               <button
                 type="button"
@@ -364,17 +405,17 @@ export function SettingsView({ audioSettings, onUpdateSettings }: SettingsViewPr
             <div className="flex flex-col gap-2.5 text-xs text-[#9B9BA3] leading-relaxed">
               <div className="flex items-center gap-2 text-[#F5F5F7]">
                 <CheckCircle2 className="w-4 h-4 text-[#D6FE3E] shrink-0" />
-                <span>100% Offline & Lokal</span>
+                <span>100% Offline & Local</span>
               </div>
               <p>
-                RunCue tidak mengumpulkan data pribadi, lokasi GPS, atau riwayat lari Anda ke server manapun. Semua preset dan pengaturan tersimpan sepenuhnya di memori perangkat Anda (LocalStorage).
+                RunCue never sends personal details, workout logs, or GPS locations to any remote server. All presets and settings reside strictly on your device (LocalStorage).
               </p>
               <div className="flex items-center gap-2 text-[#F5F5F7] pt-1">
                 <CheckCircle2 className="w-4 h-4 text-[#D6FE3E] shrink-0" />
-                <span>Bebas Akun & Bebas Iklan</span>
+                <span>No Accounts & No Ads</span>
               </div>
               <p>
-                Aplikasi ini siap digunakan seketika tanpa pendaftaran akun dan tanpa pelacak analitik pihak ketiga.
+                Ready to use instantly with zero account signup and zero third-party advertising or trackers.
               </p>
             </div>
 
@@ -383,20 +424,20 @@ export function SettingsView({ audioSettings, onUpdateSettings }: SettingsViewPr
               onClick={() => setActiveModal(null)}
               className="w-full h-11 rounded-full bg-[#D6FE3E] text-[#111108] font-bold text-xs cursor-pointer mt-1"
             >
-              Tutup
+              Close
             </button>
           </div>
         </div>
       )}
 
-      {/* MODAL: Bantuan & Masukan */}
+      {/* MODAL: Help & Feedback */}
       {activeModal === 'help' && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs">
           <div className="w-full max-w-sm bg-[#18181B] rounded-3xl p-6 shadow-2xl border border-[#2B2B30] flex flex-col gap-4 animate-in fade-in-50 zoom-in-95">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <LifeBuoy className="w-5 h-5 text-[#D6FE3E]" />
-                <h3 className="text-base font-bold text-[#F5F5F7]">Bantuan Latihan</h3>
+                <h3 className="text-base font-bold text-[#F5F5F7]">Workout Help</h3>
               </div>
               <button
                 type="button"
@@ -409,12 +450,12 @@ export function SettingsView({ audioSettings, onUpdateSettings }: SettingsViewPr
 
             <div className="flex flex-col gap-3 text-xs text-[#9B9BA3] leading-relaxed">
               <div className="p-3 rounded-2xl bg-[#232327] border border-[#2B2B30]">
-                <span className="font-bold text-[#F5F5F7] block mb-1">Interval Training C25K</span>
-                Kombinasi lari dan jalan santai secara teratur membantu membangun daya tahan jantung dan paru tanpa risiko cedera berlebih.
+                <span className="font-bold text-[#F5F5F7] block mb-1">C25K Interval Running</span>
+                Alternating between steady running and brisk walking builds cardiovascular endurance safely without overstraining joints.
               </div>
               <div className="p-3 rounded-2xl bg-[#232327] border border-[#2B2B30]">
-                <span className="font-bold text-[#F5F5F7] block mb-1">Volume Media</span>
-                Pastikan volume media perangkat dinaikkan sebelum memulai agar instruksi terdengar jelas saat berolahraga di luar ruangan.
+                <span className="font-bold text-[#F5F5F7] block mb-1">Media Volume</span>
+                Ensure your phone&apos;s media volume is turned up before starting outdoor sessions so you never miss a cue.
               </div>
             </div>
 
@@ -423,10 +464,15 @@ export function SettingsView({ audioSettings, onUpdateSettings }: SettingsViewPr
               onClick={() => setActiveModal(null)}
               className="w-full h-11 rounded-full bg-[#D6FE3E] text-[#111108] font-bold text-xs cursor-pointer mt-1"
             >
-              Tutup
+              Close
             </button>
           </div>
         </div>
+      )}
+
+      {/* MODAL: Panduan Pasang ke Layar Utama HP */}
+      {activeModal === 'installPwa' && (
+        <InstallGuideModal onClose={() => setActiveModal(null)} />
       )}
     </div>
   );

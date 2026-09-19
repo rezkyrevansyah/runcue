@@ -3,7 +3,7 @@
 import React from 'react';
 import { House, ListChecks, Settings } from 'lucide-react';
 
-export type NavTab = 'beranda' | 'latihan' | 'pengaturan';
+export type NavTab = 'home' | 'workouts' | 'settings';
 
 interface BottomNavProps {
   activeTab: NavTab;
@@ -12,9 +12,9 @@ interface BottomNavProps {
 
 export function BottomNav({ activeTab, onTabChange }: BottomNavProps) {
   const tabs = [
-    { id: 'beranda' as NavTab, label: 'Beranda', icon: House },
-    { id: 'latihan' as NavTab, label: 'Latihan', icon: ListChecks },
-    { id: 'pengaturan' as NavTab, label: 'Pengaturan', icon: Settings },
+    { id: 'home' as NavTab, label: 'Home', icon: House },
+    { id: 'workouts' as NavTab, label: 'Workouts', icon: ListChecks },
+    { id: 'settings' as NavTab, label: 'Settings', icon: Settings },
   ];
 
   return (

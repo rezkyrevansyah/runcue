@@ -43,10 +43,10 @@ export function WorkoutsView({
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
   const filterCategories: { id: FilterCategory; label: string }[] = [
-    { id: 'all', label: 'Semua' },
-    { id: 'interval', label: 'Interval' },
-    { id: 'run', label: 'Lari' },
-    { id: 'walk', label: 'Jalan' },
+    { id: 'all', label: 'All' },
+    { id: 'interval', label: 'Intervals' },
+    { id: 'run', label: 'Run' },
+    { id: 'walk', label: 'Walk' },
   ];
 
   const filteredWorkouts = useMemo(() => {
@@ -106,10 +106,10 @@ export function WorkoutsView({
       <header className="flex items-center justify-between w-full">
         <div>
           <h1 className="text-2xl font-black tracking-tight text-[#F5F5F7]">
-            Daftar Latihan
+            Workouts
           </h1>
           <p className="text-xs text-[#9B9BA3] mt-0.5 font-medium">
-            {workouts.length} preset latihan tersimpan
+            {workouts.length} saved workouts
           </p>
         </div>
 
@@ -119,7 +119,7 @@ export function WorkoutsView({
           className="flex items-center gap-1.5 h-10 px-4 rounded-full bg-[#D6FE3E] hover:bg-[#c9f62c] text-[#111108] text-xs font-black active:scale-95 transition cursor-pointer shadow-md shadow-[#D6FE3E]/15"
         >
           <Plus className="w-4 h-4 stroke-[3]" />
-          <span>Buat Baru</span>
+          <span>New Workout</span>
         </button>
       </header>
 
@@ -130,7 +130,7 @@ export function WorkoutsView({
           type="text"
           value={searchQuery}
           onChange={e => setSearchQuery(e.target.value)}
-          placeholder="Cari nama latihan atau tahap..."
+          placeholder="Search workout name or stage..."
           className="w-full h-11 pl-10 pr-9 rounded-2xl bg-[#18181B] border border-[#2B2B30] text-xs text-[#F5F5F7] placeholder-[#67676F] focus:outline-none focus:border-[#D6FE3E] transition"
         />
         {searchQuery && (
@@ -170,11 +170,11 @@ export function WorkoutsView({
         <div className="flex flex-col items-center justify-center p-8 rounded-3xl bg-[#18181B] border border-[#2B2B30] text-center gap-3 my-4">
           <Layers className="w-8 h-8 text-[#67676F]" />
           <div className="flex flex-col gap-1">
-            <span className="text-sm font-bold text-[#F5F5F7]">Tidak ada latihan ditemukan</span>
+            <span className="text-sm font-bold text-[#F5F5F7]">No workouts found</span>
             <span className="text-xs text-[#9B9BA3]">
               {searchQuery
-                ? `Tidak ada latihan yang cocok dengan "${searchQuery}".`
-                : 'Belum ada latihan pada kategori ini.'}
+                ? `No workouts match "${searchQuery}".`
+                : 'No workouts in this category yet.'}
             </span>
           </div>
           {searchQuery ? (
@@ -183,7 +183,7 @@ export function WorkoutsView({
               onClick={() => setSearchQuery('')}
               className="text-xs font-bold text-[#D6FE3E] underline cursor-pointer mt-1"
             >
-              Hapus pencarian
+              Clear search
             </button>
           ) : (
             <button
@@ -191,7 +191,7 @@ export function WorkoutsView({
               onClick={onCreateNew}
               className="h-10 px-4 rounded-full bg-[#232327] hover:bg-[#2B2B30] text-xs font-bold text-[#F5F5F7] cursor-pointer mt-1"
             >
-              Buat Latihan Sekarang
+              Create Workout Now
             </button>
           )}
         </div>
@@ -226,7 +226,7 @@ export function WorkoutsView({
                           {formatTimeMMSS(totalSec)}
                         </span>
                         <span>·</span>
-                        <span>{expanded.length} tahap</span>
+                        <span>{expanded.length} stages</span>
                       </div>
                     </div>
                   </div>
@@ -237,7 +237,7 @@ export function WorkoutsView({
                       type="button"
                       onClick={() => onDuplicateWorkout(w)}
                       className="w-8 h-8 rounded-xl flex items-center justify-center text-[#67676F] hover:text-[#F5F5F7] hover:bg-[#232327] transition cursor-pointer"
-                      title="Duplikasi"
+                      title="Duplicate"
                     >
                       <Copy className="w-3.5 h-3.5" />
                     </button>
@@ -245,7 +245,7 @@ export function WorkoutsView({
                       type="button"
                       onClick={() => onEditWorkout(w)}
                       className="w-8 h-8 rounded-xl flex items-center justify-center text-[#67676F] hover:text-[#F5F5F7] hover:bg-[#232327] transition cursor-pointer"
-                      title="Ubah Latihan"
+                      title="Edit Workout"
                     >
                       <SlidersHorizontal className="w-3.5 h-3.5" />
                     </button>
@@ -254,7 +254,7 @@ export function WorkoutsView({
                         type="button"
                         onClick={() => setDeleteConfirmId(w.id)}
                         className="w-8 h-8 rounded-xl flex items-center justify-center text-[#67676F] hover:text-[#FF5A52] hover:bg-[#232327] transition cursor-pointer"
-                        title="Hapus"
+                        title="Delete"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -305,7 +305,7 @@ export function WorkoutsView({
                   className="w-full h-11 rounded-2xl bg-[#232327] hover:bg-[#D6FE3E] text-[#F5F5F7] hover:text-[#111108] font-bold text-xs flex items-center justify-center gap-2 active:scale-[0.98] transition cursor-pointer mt-0.5"
                 >
                   <Play className="w-3.5 h-3.5 fill-current ml-0.5" />
-                  <span>Pilih & Mulai Sesi</span>
+                  <span>Select & Start Session</span>
                 </button>
               </div>
             );
@@ -317,9 +317,9 @@ export function WorkoutsView({
       {deleteConfirmId && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-xs">
           <div className="w-full max-w-sm bg-[#18181B] rounded-3xl p-6 shadow-2xl border border-[#2B2B30] flex flex-col gap-4 animate-in fade-in-50 zoom-in-95">
-            <h3 className="text-base font-bold text-[#F5F5F7]">Hapus Latihan?</h3>
+            <h3 className="text-base font-bold text-[#F5F5F7]">Delete Workout?</h3>
             <p className="text-xs text-[#9B9BA3] leading-relaxed">
-              Latihan ini akan dihapus permanen dari perangkat Anda.
+              This workout will be permanently removed from your device.
             </p>
             <div className="grid grid-cols-2 gap-3 pt-2">
               <button
@@ -327,7 +327,7 @@ export function WorkoutsView({
                 onClick={() => setDeleteConfirmId(null)}
                 className="h-11 rounded-full bg-[#232327] hover:bg-[#2B2B30] text-[#F5F5F7] font-semibold text-sm active:scale-95 transition cursor-pointer"
               >
-                Batal
+                Cancel
               </button>
               <button
                 type="button"
@@ -337,7 +337,7 @@ export function WorkoutsView({
                 }}
                 className="h-11 rounded-full bg-[#FF5A52] hover:bg-[#f0453d] text-white font-semibold text-sm active:scale-95 transition cursor-pointer shadow-sm shadow-red-500/20"
               >
-                Hapus
+                Delete
               </button>
             </div>
           </div>

@@ -37,7 +37,7 @@ export function AudioPrepModal({
     if (isPlayingVoice) return;
     setIsPlayingVoice(true);
     unlockAudio();
-    await speakText('Persiapan selesai. Tiga, dua, satu, lari!', settings.speechRate || 'normal');
+    await speakText('Audio setup ready. Three, two, one, go!', settings.speechRate || 'normal');
     setIsPlayingVoice(false);
   };
 
@@ -72,18 +72,18 @@ export function AudioPrepModal({
             type="button"
             onClick={onCancel}
             className="w-10 h-10 rounded-full bg-[#18181B] border border-[#2B2B30] text-[#F5F5F7] flex items-center justify-center active:scale-95 transition cursor-pointer"
-            title="Kembali"
+            title="Back"
           >
             <ChevronLeft className="w-5 h-5" />
           </button>
           <h2 className="text-lg font-bold text-[#F5F5F7]">
-            Persiapan Audio
+            Audio Setup
           </h2>
         </div>
 
         {/* Intro */}
         <p className="text-xs text-[#9B9BA3] leading-relaxed">
-          Pastikan suara siap sebelum mulai. Notifikasi sesi akan aktif selama latihan berlangsung.
+          Ensure audio is ready before starting. Workout cues and notifications will run in the background.
         </p>
 
         {/* VoiceStatusCard */}
@@ -95,10 +95,10 @@ export function AudioPrepModal({
               </div>
               <div className="flex flex-col">
                 <span className="text-sm font-bold text-[#F5F5F7]">
-                  Suara Bahasa Indonesia
+                  English Voice Guidance
                 </span>
                 <span className="text-xs font-semibold text-[#CFFF04]">
-                  Tersedia di perangkat ini
+                  Ready on this device
                 </span>
               </div>
             </div>
@@ -114,7 +114,7 @@ export function AudioPrepModal({
               className="flex items-center justify-center gap-2 h-11 px-3 rounded-xl bg-[#18181B] hover:bg-[#202024] border border-[#2B2B30] text-xs font-semibold text-[#F5F5F7] transition active:scale-95 disabled:opacity-50 cursor-pointer"
             >
               <Volume2 className="w-3.5 h-3.5 text-[#F5F5F7]" />
-              <span>{isPlayingVoice ? 'Memutar...' : 'Tes Suara'}</span>
+              <span>{isPlayingVoice ? 'Playing...' : 'Test Voice'}</span>
             </button>
 
             <button
@@ -124,7 +124,7 @@ export function AudioPrepModal({
               className="flex items-center justify-center gap-2 h-11 px-3 rounded-xl bg-[#18181B] hover:bg-[#202024] border border-[#2B2B30] text-xs font-semibold text-[#F5F5F7] transition active:scale-95 disabled:opacity-50 cursor-pointer"
             >
               <BellRing className="w-3.5 h-3.5 text-[#F5F5F7]" />
-              <span>{isPlayingBeep ? 'Bunyi...' : 'Tes Bunyi'}</span>
+              <span>{isPlayingBeep ? 'Beeping...' : 'Test Beep'}</span>
             </button>
           </div>
         </div>
@@ -136,9 +136,9 @@ export function AudioPrepModal({
               <Headphones className="w-5 h-5 text-[#F5F5F7]" />
             </div>
             <div className="flex flex-col">
-              <span className="text-sm font-bold text-[#F5F5F7]">Pakai headset</span>
+              <span className="text-sm font-bold text-[#F5F5F7]">Use Headphones</span>
               <span className="text-xs text-[#9B9BA3] leading-tight">
-                Cue tetap terdengar walau HP di kantong dan layar mati.
+                Cues stay audible while phone is in your pocket and screen is off.
               </span>
             </div>
           </div>
@@ -148,9 +148,9 @@ export function AudioPrepModal({
               <Volume2 className="w-5 h-5 text-[#F5F5F7]" />
             </div>
             <div className="flex flex-col">
-              <span className="text-sm font-bold text-[#F5F5F7]">Naikkan volume media</span>
+              <span className="text-sm font-bold text-[#F5F5F7]">Turn Up Media Volume</span>
               <span className="text-xs text-[#9B9BA3] leading-tight">
-                Pastikan volume media cukup keras sebelum mulai.
+                Ensure media volume is loud enough before beginning.
               </span>
             </div>
           </div>
@@ -160,9 +160,9 @@ export function AudioPrepModal({
               <Bell className="w-5 h-5 text-[#F5F5F7]" />
             </div>
             <div className="flex flex-col">
-              <span className="text-sm font-bold text-[#F5F5F7]">Izinkan notifikasi</span>
+              <span className="text-sm font-bold text-[#F5F5F7]">Keep Notifications On</span>
               <span className="text-xs text-[#9B9BA3] leading-tight">
-                Notifikasi sesi menampilkan tahap dan kontrol saat aktif.
+                Shows active stages and timer controls during your run.
               </span>
             </div>
           </div>
@@ -175,14 +175,14 @@ export function AudioPrepModal({
             onClick={() => setShowAdvancedSettings(!showAdvancedSettings)}
             className="flex items-center justify-between py-1 text-xs font-semibold text-[#9B9BA3] hover:text-[#F5F5F7] cursor-pointer"
           >
-            <span>Opsi Tambahan Audio</span>
+            <span>Additional Audio Options</span>
             <ChevronDown className={`w-4 h-4 transition-transform ${showAdvancedSettings ? 'rotate-180' : ''}`} />
           </button>
 
           {showAdvancedSettings && (
             <div className="flex flex-col gap-2.5 p-3.5 rounded-2xl bg-[#18181B] border border-[#2B2B30] text-xs">
               <div className="flex items-center justify-between">
-                <span>Panduan Suara</span>
+                <span>Voice Guidance</span>
                 <input
                   type="checkbox"
                   checked={settings.voiceEnabled}
@@ -191,7 +191,7 @@ export function AudioPrepModal({
                 />
               </div>
               <div className="flex items-center justify-between">
-                <span>Bunyi Beep Transisi</span>
+                <span>Transition Beeps</span>
                 <input
                   type="checkbox"
                   checked={settings.beepEnabled}
@@ -200,7 +200,7 @@ export function AudioPrepModal({
                 />
               </div>
               <div className="flex items-center justify-between">
-                <span>Hitung Mundur 3-2-1</span>
+                <span>3-2-1 Countdown Beeps</span>
                 <input
                   type="checkbox"
                   checked={settings.countdownEnabled}
@@ -209,7 +209,7 @@ export function AudioPrepModal({
                 />
               </div>
               <div className="flex items-center justify-between">
-                <span>Layar Tetap Aktif (WakeLock)</span>
+                <span>Keep Screen Awake (WakeLock)</span>
                 <input
                   type="checkbox"
                   checked={settings.wakeLockEnabled}
@@ -221,13 +221,13 @@ export function AudioPrepModal({
           )}
         </div>
 
-        {/* PrimaryButton Mulai Sesi */}
+        {/* PrimaryButton Start Session */}
         <button
           type="button"
           onClick={handleStart}
           className="w-full h-13 rounded-full bg-[#D6FE3E] hover:bg-[#c9f62c] text-[#111108] font-black text-sm flex items-center justify-center gap-2 active:scale-95 transition cursor-pointer shadow-lg shadow-[#D6FE3E]/15 mt-1"
         >
-          <span>Mulai Sesi</span>
+          <span>Start Session</span>
         </button>
       </div>
     </div>

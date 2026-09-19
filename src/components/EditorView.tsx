@@ -23,7 +23,6 @@ import {
   Wind,
   Coffee,
   Sliders,
-  GripVertical,
 } from 'lucide-react';
 
 interface EditorViewProps {
@@ -52,11 +51,11 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
 
   const validateWorkout = (): boolean => {
     if (!currentWorkout.name.trim()) {
-      setValidationError('Nama latihan tidak boleh kosong.');
+      setValidationError('Workout name cannot be empty.');
       return false;
     }
     if (currentWorkout.blocks.length === 0) {
-      setValidationError('Tambahkan minimal 1 langkah latihan.');
+      setValidationError('Add at least 1 workout stage.');
       return false;
     }
     const hasTooShortStep = currentWorkout.blocks.some(b =>
@@ -65,11 +64,11 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
         : b.steps.some(s => s.durationSeconds < 5)
     );
     if (hasTooShortStep) {
-      setValidationError('Setiap langkah latihan harus berdurasi minimal 5 detik.');
+      setValidationError('Each workout stage must be at least 5 seconds.');
       return false;
     }
     if (totalSeconds <= 0) {
-      setValidationError('Durasi latihan harus lebih dari 0 detik.');
+      setValidationError('Workout duration must be greater than 0 seconds.');
       return false;
     }
     setValidationError(null);
@@ -129,6 +128,25 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
     });
   };
 
+  const handleMoveSubStep = (groupId: string, subStepIndex: number, direction: 'up' | 'down') => {
+    setCurrentWorkout(prev => {
+      const newBlocks = prev.blocks.map(b => {
+        if (b.kind === 'repeat' && b.id === groupId) {
+          const rg = b as RepeatGroup;
+          const targetIndex = direction === 'up' ? subStepIndex - 1 : subStepIndex + 1;
+          if (targetIndex < 0 || targetIndex >= rg.steps.length) return b;
+          const newSteps = [...rg.steps];
+          const temp = newSteps[subStepIndex];
+          newSteps[subStepIndex] = newSteps[targetIndex];
+          newSteps[targetIndex] = temp;
+          return { ...rg, steps: newSteps };
+        }
+        return b;
+      });
+      return { ...prev, blocks: newBlocks, updatedAt: new Date().toISOString() };
+    });
+  };
+
   const handleDuplicateBlock = (index: number) => {
     setCurrentWorkout(prev => {
       const blockToDup = prev.blocks[index];
@@ -159,30 +177,11 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
 
   const handleDeleteBlock = (index: number) => {
     if (currentWorkout.blocks.length <= 1) {
-      setValidationError('Latihan harus memiliki minimal 1 langkah.');
+      setValidationError('A workout must have at least 1 stage.');
       return;
     }
     setCurrentWorkout(prev => {
       const newBlocks = prev.blocks.filter((_, i) => i !== index);
-      return { ...prev, blocks: newBlocks, updatedAt: new Date().toISOString() };
-    });
-  };
-
-  const handleMoveSubStep = (groupId: string, subStepIndex: number, direction: 'up' | 'down') => {
-    setCurrentWorkout(prev => {
-      const newBlocks = prev.blocks.map(b => {
-        if (b.kind === 'repeat' && b.id === groupId) {
-          const rg = b as RepeatGroup;
-          const targetIndex = direction === 'up' ? subStepIndex - 1 : subStepIndex + 1;
-          if (targetIndex < 0 || targetIndex >= rg.steps.length) return b;
-          const newSteps = [...rg.steps];
-          const temp = newSteps[subStepIndex];
-          newSteps[subStepIndex] = newSteps[targetIndex];
-          newSteps[targetIndex] = temp;
-          return { ...rg, steps: newSteps };
-        }
-        return b;
-      });
       return { ...prev, blocks: newBlocks, updatedAt: new Date().toISOString() };
     });
   };
@@ -192,7 +191,7 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
       id: `step-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
       kind: 'step',
       type: 'run',
-      label: 'Lari',
+      label: 'Run',
       durationSeconds: 60,
     };
     setCurrentWorkout(prev => ({
@@ -212,14 +211,14 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
           id: `step-${Date.now()}-1-${Math.random().toString(36).slice(2, 5)}`,
           kind: 'step',
           type: 'run',
-          label: 'Lari',
+          label: 'Run',
           durationSeconds: 60,
         },
         {
           id: `step-${Date.now()}-2-${Math.random().toString(36).slice(2, 5)}`,
           kind: 'step',
           type: 'walk',
-          label: 'Jalan',
+          label: 'Walk',
           durationSeconds: 120,
         },
       ],
@@ -240,7 +239,7 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
             id: `step-${Date.now()}-${Math.random().toString(36).slice(2, 6)}`,
             kind: 'step',
             type: 'walk',
-            label: 'Jalan',
+            label: 'Walk',
             durationSeconds: 90,
           };
           return { ...rg, steps: [...rg.steps, newStep] };
@@ -277,26 +276,26 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
 
   return (
     <div className="flex flex-col gap-5 max-w-md mx-auto w-full px-5 pt-3 pb-32">
-      {/* 04 Editor Latihan Header */}
+      {/* 04 Editor Header */}
       <header className="flex items-center justify-between w-full">
         <button
           type="button"
           onClick={onBack}
           className="w-10 h-10 rounded-full bg-[#18181B] border border-[#2B2B30] text-[#F5F5F7] flex items-center justify-center active:scale-95 transition cursor-pointer"
-          title="Tutup Editor"
+          title="Close Editor"
         >
           <X className="w-5 h-5" />
         </button>
 
         <h1 className="text-base font-bold text-[#F5F5F7]">
-          Editor Latihan
+          Workout Editor
         </h1>
 
         <button
           type="button"
           onClick={() => setShowPreviewModal(true)}
           className="w-10 h-10 rounded-full bg-[#18181B] border border-[#2B2B30] text-[#F5F5F7] flex items-center justify-center active:scale-95 transition cursor-pointer"
-          title="Lihat Urutan Lengkap"
+          title="View Full Sequence"
         >
           <ListOrdered className="w-4 h-4" />
         </button>
@@ -305,14 +304,14 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
       {/* Workout Name Card */}
       <div className="flex flex-col gap-1.5 p-4 rounded-2xl bg-[#18181B] border border-[#2B2B30]">
         <label className="text-[11px] font-bold text-[#67676F] uppercase tracking-wider">
-          Nama Latihan
+          Workout Name
         </label>
         <input
           type="text"
           value={currentWorkout.name}
           maxLength={60}
           onChange={e => handleUpdateName(e.target.value)}
-          placeholder="Nama latihan..."
+          placeholder="Workout name..."
           className="w-full bg-transparent border-none text-[#F5F5F7] font-bold text-base placeholder-[#67676F] focus:outline-none"
         />
       </div>
@@ -321,9 +320,9 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
       <div className="flex items-center justify-between px-4 py-3 rounded-2xl bg-[#D6FE3E] text-[#111108] shadow-md shadow-[#D6FE3E]/10">
         <div className="flex items-center gap-2 font-black text-xs">
           <Clock className="w-4 h-4 stroke-[2.5]" />
-          <span>Total {formatTimeMMSS(totalSeconds)} · {expandedSteps.length} tahap</span>
+          <span>Total {formatTimeMMSS(totalSeconds)} · {expandedSteps.length} stages</span>
         </div>
-        <span className="text-xs font-black">Siap ✓</span>
+        <span className="text-xs font-black">Ready ✓</span>
       </div>
 
       {/* Validation Alert */}
@@ -370,7 +369,7 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
                       size="sm"
                     />
                     <span className="text-[11px] text-[#67676F] mt-0.5">
-                      Langkah tunggal
+                      Single stage
                     </span>
                   </div>
                 </div>
@@ -392,7 +391,7 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
                       }}
                       className="w-12 bg-transparent text-right font-black text-sm text-[#F5F5F7] tabular-nums focus:outline-none"
                     />
-                    <span className="text-[11px] text-[#9B9BA3] font-bold ml-1">dtk</span>
+                    <span className="text-[11px] text-[#9B9BA3] font-bold ml-1">sec</span>
                   </div>
 
                   <div className="flex items-center gap-0.5">
@@ -401,7 +400,7 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
                       onClick={() => handleMoveBlock(index, 'up')}
                       disabled={index === 0}
                       className="p-1 rounded-lg text-[#67676F] hover:text-[#F5F5F7] hover:bg-[#232327] disabled:opacity-20 cursor-pointer"
-                      title="Geser Naik"
+                      title="Move Up"
                     >
                       <ArrowUp className="w-3.5 h-3.5" />
                     </button>
@@ -410,7 +409,7 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
                       onClick={() => handleMoveBlock(index, 'down')}
                       disabled={index === currentWorkout.blocks.length - 1}
                       className="p-1 rounded-lg text-[#67676F] hover:text-[#F5F5F7] hover:bg-[#232327] disabled:opacity-20 cursor-pointer"
-                      title="Geser Turun"
+                      title="Move Down"
                     >
                       <ArrowDown className="w-3.5 h-3.5" />
                     </button>
@@ -418,7 +417,7 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
                       type="button"
                       onClick={() => handleDuplicateBlock(index)}
                       className="p-1 rounded-lg text-[#67676F] hover:text-[#F5F5F7] hover:bg-[#232327] cursor-pointer"
-                      title="Duplikasi"
+                      title="Duplicate"
                     >
                       <Copy className="w-3.5 h-3.5" />
                     </button>
@@ -426,7 +425,7 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
                       type="button"
                       onClick={() => handleDeleteBlock(index)}
                       className="p-1 rounded-lg text-[#67676F] hover:text-[#FF5A52] hover:bg-[#232327] cursor-pointer"
-                      title="Hapus"
+                      title="Delete"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
@@ -448,7 +447,7 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <Repeat className="w-4 h-4 text-[#D6FE3E]" />
-                    <span className="text-sm font-bold text-[#F5F5F7]">Grup Pengulangan</span>
+                    <span className="text-sm font-bold text-[#F5F5F7]">Repeat Group</span>
                   </div>
 
                   <div className="flex items-center gap-2">
@@ -479,7 +478,7 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
                         onClick={() => handleMoveBlock(index, 'up')}
                         disabled={index === 0}
                         className="p-1 rounded-lg text-[#67676F] hover:text-[#F5F5F7] hover:bg-[#18181B] disabled:opacity-20 cursor-pointer"
-                        title="Geser Naik"
+                        title="Move Up"
                       >
                         <ArrowUp className="w-3.5 h-3.5" />
                       </button>
@@ -488,7 +487,7 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
                         onClick={() => handleMoveBlock(index, 'down')}
                         disabled={index === currentWorkout.blocks.length - 1}
                         className="p-1 rounded-lg text-[#67676F] hover:text-[#F5F5F7] hover:bg-[#18181B] disabled:opacity-20 cursor-pointer"
-                        title="Geser Turun"
+                        title="Move Down"
                       >
                         <ArrowDown className="w-3.5 h-3.5" />
                       </button>
@@ -496,7 +495,7 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
                         type="button"
                         onClick={() => handleDuplicateBlock(index)}
                         className="p-1 rounded-lg text-[#67676F] hover:text-[#F5F5F7] hover:bg-[#18181B] cursor-pointer"
-                        title="Duplikasi"
+                        title="Duplicate"
                       >
                         <Copy className="w-3.5 h-3.5" />
                       </button>
@@ -504,7 +503,7 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
                         type="button"
                         onClick={() => handleDeleteBlock(index)}
                         className="p-1 rounded-lg text-[#67676F] hover:text-[#FF5A52] hover:bg-[#18181B] cursor-pointer"
-                        title="Hapus"
+                        title="Delete"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
@@ -567,7 +566,7 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
                               }}
                               className="w-10 bg-transparent text-right font-black text-xs text-[#F5F5F7] tabular-nums focus:outline-none"
                             />
-                            <span className="text-[10px] text-[#9B9BA3] font-bold ml-1">dtk</span>
+                            <span className="text-[10px] text-[#9B9BA3] font-bold ml-1">sec</span>
                           </div>
 
                           {rg.steps.length > 1 && (
@@ -577,7 +576,7 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
                                 onClick={() => handleMoveSubStep(rg.id, subIdx, 'up')}
                                 disabled={subIdx === 0}
                                 className="p-1 rounded-lg text-[#67676F] hover:text-[#F5F5F7] hover:bg-[#232327] disabled:opacity-20 cursor-pointer"
-                                title="Geser Naik"
+                                title="Move Up"
                               >
                                 <ArrowUp className="w-3 h-3" />
                               </button>
@@ -586,7 +585,7 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
                                 onClick={() => handleMoveSubStep(rg.id, subIdx, 'down')}
                                 disabled={subIdx === rg.steps.length - 1}
                                 className="p-1 rounded-lg text-[#67676F] hover:text-[#F5F5F7] hover:bg-[#232327] disabled:opacity-20 cursor-pointer"
-                                title="Geser Turun"
+                                title="Move Down"
                               >
                                 <ArrowDown className="w-3 h-3" />
                               </button>
@@ -594,7 +593,7 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
                                 type="button"
                                 onClick={() => handleDeleteSubStep(rg.id, subStep.id)}
                                 className="p-1 rounded-lg text-[#67676F] hover:text-[#FF5A52] hover:bg-[#232327] cursor-pointer"
-                                title="Hapus"
+                                title="Delete"
                               >
                                 <Trash2 className="w-3 h-3" />
                               </button>
@@ -612,7 +611,7 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
                   className="w-full py-1.5 rounded-xl border border-dashed border-[#2B2B30] hover:border-[#D6FE3E] text-[11px] font-bold text-[#9B9BA3] hover:text-[#F5F5F7] flex items-center justify-center gap-1 transition cursor-pointer"
                 >
                   <Plus className="w-3 h-3" />
-                  <span>Tambah Langkah ke Grup</span>
+                  <span>Add Stage to Group</span>
                 </button>
               </div>
             );
@@ -630,7 +629,7 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
           className="flex items-center justify-center gap-2 h-12 rounded-full border border-dashed border-[#2B2B30] hover:border-[#D6FE3E] hover:bg-[#18181B] text-[#F5F5F7] font-semibold text-xs active:scale-[0.98] transition cursor-pointer"
         >
           <Plus className="w-4 h-4" />
-          <span>Tambah Langkah</span>
+          <span>Add Stage</span>
         </button>
         <button
           type="button"
@@ -638,11 +637,11 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
           className="flex items-center justify-center gap-2 h-12 rounded-full border border-dashed border-[#2B2B30] hover:border-[#D6FE3E] hover:bg-[#18181B] text-[#F5F5F7] font-semibold text-xs active:scale-[0.98] transition cursor-pointer"
         >
           <Repeat className="w-4 h-4 text-[#D6FE3E]" />
-          <span>Tambah Grup</span>
+          <span>Add Group</span>
         </button>
       </div>
 
-      {/* Sticky Bottom Bar (Simpan & Mulai) */}
+      {/* Sticky Bottom Bar (Save & Start) */}
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-[#0A0A0B]/95 backdrop-blur-md border-t border-[#2B2B30] z-40">
         <div className="max-w-md mx-auto grid grid-cols-2 gap-3">
           <button
@@ -650,7 +649,7 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
             onClick={handleSaveAndNotify}
             className="w-full h-13 rounded-full bg-[#18181B] hover:bg-[#232327] border border-[#2B2B30] text-[#F5F5F7] font-bold text-sm flex items-center justify-center active:scale-95 transition cursor-pointer"
           >
-            Simpan
+            Save
           </button>
           <button
             type="button"
@@ -658,7 +657,7 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
             className="w-full h-13 rounded-full bg-[#D6FE3E] hover:bg-[#c9f62c] text-[#111108] font-black text-sm flex items-center justify-center gap-2 active:scale-95 transition cursor-pointer shadow-lg shadow-[#D6FE3E]/15"
           >
             <Play className="w-4 h-4 fill-current ml-0.5" />
-            <span>Mulai</span>
+            <span>Start</span>
           </button>
         </div>
       </div>
@@ -669,7 +668,7 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
           <div className="w-full max-w-md max-h-[80vh] bg-[#18181B] rounded-3xl p-6 shadow-2xl border border-[#2B2B30] flex flex-col gap-4 animate-in fade-in-50 zoom-in-95">
             <div className="flex items-center justify-between">
               <h3 className="text-base font-black text-[#F5F5F7]">
-                Urutan Lengkap ({expandedSteps.length} Tahap)
+                Full Sequence ({expandedSteps.length} Stages)
               </h3>
               <button
                 type="button"
@@ -695,7 +694,7 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
                         <span className="font-bold text-xs text-[#F5F5F7]">{step.label}</span>
                         {step.repeatIndex && (
                           <span className="text-[10px] text-[#67676F]">
-                            Putaran {step.repeatIndex}/{step.repeatCount}
+                            Round {step.repeatIndex} of {step.repeatCount}
                           </span>
                         )}
                       </div>
@@ -713,7 +712,7 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
               onClick={() => setShowPreviewModal(false)}
               className="w-full h-11 rounded-full bg-[#232327] hover:bg-[#2B2B30] text-[#F5F5F7] font-semibold text-xs cursor-pointer"
             >
-              Tutup
+              Close
             </button>
           </div>
         </div>

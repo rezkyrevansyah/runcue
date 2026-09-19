@@ -23,7 +23,7 @@ type AppScreen = 'home' | 'editor' | 'player' | 'summary';
 export default function RunCueApp() {
   const [isClient, setIsClient] = useState(false);
   const [screen, setScreen] = useState<AppScreen>('home');
-  const [activeTab, setActiveTab] = useState<NavTab>('beranda');
+  const [activeTab, setActiveTab] = useState<NavTab>('home');
   const [workouts, setWorkouts] = useState<Workout[]>([DEFAULT_PRESET]);
   const [activeWorkout, setActiveWorkout] = useState<Workout>(DEFAULT_PRESET);
   const [audioSettings, setAudioSettings] = useState<AudioSettings>(DEFAULT_AUDIO_SETTINGS);
@@ -66,7 +66,7 @@ export default function RunCueApp() {
     const duplicated: Workout = {
       ...w,
       id: `workout-${Date.now()}`,
-      name: `${w.name} (Salinan)`,
+      name: `${w.name} (Copy)`,
       updatedAt: new Date().toISOString(),
     };
     setWorkouts(prev => {
@@ -80,13 +80,13 @@ export default function RunCueApp() {
     const newWorkout: Workout = {
       id: `workout-${Date.now()}`,
       schemaVersion: 1,
-      name: 'Latihan Baru',
+      name: 'New Workout',
       blocks: [
         {
           id: `step-${Date.now()}-1`,
           kind: 'step',
           type: 'warmup',
-          label: 'Pemanasan',
+          label: 'Warmup',
           durationSeconds: 300,
         },
         {
@@ -98,14 +98,14 @@ export default function RunCueApp() {
               id: `step-${Date.now()}-2`,
               kind: 'step',
               type: 'run',
-              label: 'Lari',
+              label: 'Run',
               durationSeconds: 60,
             },
             {
               id: `step-${Date.now()}-3`,
               kind: 'step',
               type: 'walk',
-              label: 'Jalan',
+              label: 'Walk',
               durationSeconds: 120,
             },
           ],
@@ -114,7 +114,7 @@ export default function RunCueApp() {
           id: `step-${Date.now()}-4`,
           kind: 'step',
           type: 'cooldown',
-          label: 'Pendinginan',
+          label: 'Cooldown',
           durationSeconds: 300,
         },
       ],
@@ -148,7 +148,7 @@ export default function RunCueApp() {
   if (!isClient) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-[#0A0A0B] text-[#F5F5F7] font-medium text-sm">
-        Memuat RunCue...
+        Loading RunCue...
       </div>
     );
   }
@@ -158,7 +158,7 @@ export default function RunCueApp() {
       {/* 1. Main Navigation Screens (with BottomNav) */}
       {screen === 'home' && (
         <>
-          {activeTab === 'beranda' && (
+          {activeTab === 'home' && (
             <HomeView
               workouts={workouts}
               onSelectWorkout={handleSelectToStart}
@@ -172,7 +172,7 @@ export default function RunCueApp() {
             />
           )}
 
-          {activeTab === 'latihan' && (
+          {activeTab === 'workouts' && (
             <WorkoutsView
               workouts={workouts}
               onSelectWorkout={handleSelectToStart}
@@ -186,7 +186,7 @@ export default function RunCueApp() {
             />
           )}
 
-          {activeTab === 'pengaturan' && (
+          {activeTab === 'settings' && (
             <SettingsView
               audioSettings={audioSettings}
               onUpdateSettings={handleUpdateAudioSettings}

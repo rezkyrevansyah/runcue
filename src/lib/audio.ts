@@ -92,19 +92,19 @@ export function speakText(text: string, rate: 'normal' | 'fast' = 'normal'): Pro
     unlockAudio();
 
     const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = 'id-ID';
+    utterance.lang = 'en-US';
     utterance.rate = rate === 'fast' ? 1.2 : 1.0;
     utterance.pitch = 1.0;
 
-    // Pick best available Indonesian voice or fallback
+    // Pick best available English voice or fallback
     const voices = cachedVoices.length > 0 ? cachedVoices : window.speechSynthesis.getVoices();
-    const idVoice = voices.find(v => {
+    const enVoice = voices.find(v => {
       const code = v.lang.toLowerCase().replace('_', '-');
-      return code === 'id-id' || code === 'id' || code.startsWith('id-');
+      return code === 'en-us' || code.startsWith('en-') || code.includes('en');
     });
 
-    if (idVoice) {
-      utterance.voice = idVoice;
+    if (enVoice) {
+      utterance.voice = enVoice;
     }
 
     utterance.onend = () => resolve();
@@ -122,55 +122,38 @@ export function speakText(text: string, rate: 'normal' | 'fast' = 'normal'): Pro
   });
 }
 
-function durationToIndonesianWords(seconds: number): string {
+function durationToEnglishWords(seconds: number): string {
   const m = Math.floor(seconds / 60);
   const s = seconds % 60;
 
-  const numberWords: Record<number, string> = {
-    1: 'satu', 2: 'dua', 3: 'tiga', 4: 'empat', 5: 'lima',
-    6: 'enam', 7: 'tujuh', 8: 'delapan', 9: 'sembilan', 10: 'sepuluh',
-    15: 'lima belas', 20: 'dua puluh', 30: 'tiga puluh', 45: 'empat puluh lima'
-  };
-
-  const getWord = (n: number) => numberWords[n] || n.toString();
-
   if (m > 0 && s > 0) {
-    return `${getWord(m)} menit ${getWord(s)} detik`;
+    return `${m} minute${m > 1 ? 's' : ''} ${s} second${s > 1 ? 's' : ''}`;
   }
   if (m > 0) {
-    return `${getWord(m)} menit`;
+    return `${m} minute${m > 1 ? 's' : ''}`;
   }
-  return `${getWord(s)} detik`;
+  return `${s} second${s > 1 ? 's' : ''}`;
 }
 
 export function generateCueInstruction(step: ExpandedStep): string {
-  const durationText = durationToIndonesianWords(step.durationSeconds);
+  const durationText = durationToEnglishWords(step.durationSeconds);
   const label = step.label.toLowerCase();
 
-  let prefix = '';
   switch (step.type) {
     case 'warmup':
-      prefix = `Mulai pemanasan. ${step.label} selama ${durationText}.`;
-      break;
+      return `Start warmup. ${step.label} for ${durationText}.`;
     case 'run':
       if (step.repeatIndex && step.repeatCount) {
-        prefix = `Mulai lari selama ${durationText}. Putaran ${step.repeatIndex} dari ${step.repeatCount}.`;
-      } else {
-        prefix = `Mulai lari selama ${durationText}.`;
+        return `Start running for ${durationText}. Round ${step.repeatIndex} of ${step.repeatCount}.`;
       }
-      break;
+      return `Start running for ${durationText}.`;
     case 'walk':
-      prefix = `Sekarang jalan selama ${durationText}.`;
-      break;
+      return `Walk for ${durationText}.`;
     case 'cooldown':
-      prefix = `Mulai pendinginan selama ${durationText}.`;
-      break;
+      return `Start cooldown for ${durationText}.`;
     case 'rest':
-      prefix = `Istirahat selama ${durationText}.`;
-      break;
+      return `Rest for ${durationText}.`;
     default:
-      prefix = `Mulai ${label} selama ${durationText}.`;
+      return `Start ${label} for ${durationText}.`;
   }
-
-  return prefix;
 }

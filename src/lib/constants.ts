@@ -6,19 +6,19 @@ export const DEFAULT_AUDIO_SETTINGS: AudioSettings = {
   countdownEnabled: true,
   wakeLockEnabled: true,
   speechRate: 'normal',
-  language: 'id-ID',
+  language: 'en-US',
 };
 
 export const DEFAULT_PRESET: Workout = {
   id: 'preset-c25k-default',
   schemaVersion: 1,
-  name: 'Interval Run/Walk C25K',
+  name: 'C25K Run/Walk Intervals',
   blocks: [
     {
       id: 'step-warmup-1',
       kind: 'step',
       type: 'warmup',
-      label: 'Pemanasan Jalan',
+      label: 'Warmup Walk',
       durationSeconds: 300, // 5:00
     },
     {
@@ -30,14 +30,14 @@ export const DEFAULT_PRESET: Workout = {
           id: 'step-run-1',
           kind: 'step',
           type: 'run',
-          label: 'Lari',
+          label: 'Run',
           durationSeconds: 60, // 1:00
         },
         {
           id: 'step-walk-1',
           kind: 'step',
           type: 'walk',
-          label: 'Jalan',
+          label: 'Walk',
           durationSeconds: 120, // 2:00
         },
       ],
@@ -46,7 +46,7 @@ export const DEFAULT_PRESET: Workout = {
       id: 'step-cooldown-1',
       kind: 'step',
       type: 'cooldown',
-      label: 'Pendinginan Jalan',
+      label: 'Cooldown Walk',
       durationSeconds: 300, // 5:00
     },
   ],
@@ -64,7 +64,7 @@ export const SAMPLE_PRESETS: Workout[] = [
         id: 's-5k-wm',
         kind: 'step',
         type: 'warmup',
-        label: 'Pemanasan',
+        label: 'Warmup',
         durationSeconds: 300,
       },
       {
@@ -76,14 +76,14 @@ export const SAMPLE_PRESETS: Workout[] = [
             id: 's-5k-run',
             kind: 'step',
             type: 'run',
-            label: 'Lari Cepat',
+            label: 'Fast Run',
             durationSeconds: 180, // 3:00
           },
           {
             id: 's-5k-walk',
             kind: 'step',
             type: 'walk',
-            label: 'Jalan Santai',
+            label: 'Easy Walk',
             durationSeconds: 90, // 1:30
           },
         ],
@@ -92,7 +92,7 @@ export const SAMPLE_PRESETS: Workout[] = [
         id: 's-5k-cd',
         kind: 'step',
         type: 'cooldown',
-        label: 'Pendinginan',
+        label: 'Cooldown',
         durationSeconds: 300,
       },
     ],
@@ -107,21 +107,21 @@ export const SAMPLE_PRESETS: Workout[] = [
         id: 's-rec-1',
         kind: 'step',
         type: 'walk',
-        label: 'Jalan Santai',
+        label: 'Easy Walk',
         durationSeconds: 900, // 15:00
       },
       {
         id: 's-rec-2',
         kind: 'step',
         type: 'walk',
-        label: 'Jalan Cepat',
+        label: 'Brisk Walk',
         durationSeconds: 300, // 5:00
       },
       {
         id: 's-rec-3',
         kind: 'step',
         type: 'cooldown',
-        label: 'Jalan Pemulihan',
+        label: 'Recovery Walk',
         durationSeconds: 600, // 10:00
       },
     ],
@@ -141,7 +141,7 @@ export const STEP_TYPE_CONFIG: Record<
   }
 > = {
   warmup: {
-    label: 'Pemanasan',
+    label: 'Warmup',
     badgeBg: 'bg-[#FFB020]/15',
     badgeColor: 'text-[#FFB020]',
     strokeColor: 'border-[#FFB020]/40',
@@ -149,7 +149,7 @@ export const STEP_TYPE_CONFIG: Record<
     defaultDuration: 300,
   },
   run: {
-    label: 'Lari',
+    label: 'Run',
     badgeBg: 'bg-[#CFFF04]',
     badgeColor: 'text-[#111108]',
     strokeColor: 'border-[#CFFF04]',
@@ -157,7 +157,7 @@ export const STEP_TYPE_CONFIG: Record<
     defaultDuration: 60,
   },
   walk: {
-    label: 'Jalan',
+    label: 'Walk',
     badgeBg: 'bg-[#5B9CFF]/15',
     badgeColor: 'text-[#5B9CFF]',
     strokeColor: 'border-[#5B9CFF]/40',
@@ -165,7 +165,7 @@ export const STEP_TYPE_CONFIG: Record<
     defaultDuration: 120,
   },
   cooldown: {
-    label: 'Pendinginan',
+    label: 'Cooldown',
     badgeBg: 'bg-[#37D6C4]/15',
     badgeColor: 'text-[#37D6C4]',
     strokeColor: 'border-[#37D6C4]/40',
@@ -173,7 +173,7 @@ export const STEP_TYPE_CONFIG: Record<
     defaultDuration: 300,
   },
   rest: {
-    label: 'Istirahat',
+    label: 'Rest',
     badgeBg: 'bg-[#8A8A92]/15',
     badgeColor: 'text-[#8A8A92]',
     strokeColor: 'border-[#8A8A92]/40',
@@ -181,7 +181,7 @@ export const STEP_TYPE_CONFIG: Record<
     defaultDuration: 60,
   },
   custom: {
-    label: 'Kustom',
+    label: 'Custom',
     badgeBg: 'bg-[#FF6AC2]/15',
     badgeColor: 'text-[#FF6AC2]',
     strokeColor: 'border-[#FF6AC2]/40',
@@ -200,7 +200,7 @@ export function formatTimeMMSS(seconds: number): string {
 export function formatDurationHuman(seconds: number): string {
   const m = Math.floor(seconds / 60);
   const s = seconds % 60;
-  if (s === 0) return `${m} menit`;
-  if (m === 0) return `${s} detik`;
+  if (s === 0) return `${m} min`;
+  if (m === 0) return `${s} sec`;
   return `${m}m ${s}s`;
 }
