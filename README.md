@@ -1,6 +1,10 @@
 # RunCue
 
 <p align="center">
+  <img src="public/images/Portfolio Cover - RunCue.png" alt="RunCue project cover" width="1200" />
+</p>
+
+<p align="center">
   <a href="https://github.com/rezkyrevansyah/runcue">
     <img src="https://img.shields.io/github/stars/rezkyrevansyah/runcue?style=for-the-badge&logo=github" alt="GitHub Repo stars" />
   </a>
@@ -16,53 +20,53 @@
 </p>
 
 <p align="center">
-  <strong>Latihan interval lari & jalan yang fokus pada gerakan, bukan layar.</strong>
+  <strong>Run smarter. Train without staring at the clock.</strong>
 </p>
 
-RunCue adalah aplikasi web mobile-first untuk membangun sesi latihan interval Anda sendiri. Anda bisa mengatur durasi pemanasan, lari, jalan, pendinginan, dan repetisi tanpa perlu terus melihat jam. Saat sesi berjalan, aplikasi memberi cue suara otomatis agar Anda tetap fokus pada ritme dan pernapasan.
+RunCue is a mobile-first web app for building custom interval workouts. You can set warm-up, run, walk, cooldown, and repeat phases without constantly checking the time. During the session, the app gives automatic voice cues so you can stay focused on your rhythm and breathing.
 
-## Mengapa RunCue?
+## Why RunCue?
 
-- Fokus pada latihan tanpa gangguan: tidak perlu melihat layar terus-menerus
-- Bikin rutinitas dengan cepat: drag-and-drop style workflow untuk sesi interval
-- Cue suara otomatis: instruksi berbasis suara untuk transisi fase latihan
-- Mobile-first design: praktis untuk digunakan di ponsel saat berlari atau berjalan
-- Local-first: tanpa akun, tanpa database, data tersimpan di perangkat sendiri
-- Mudah dimodifikasi: cocok untuk pemula hingga latihan yang lebih kompleks
+- Zero distraction training: no need to keep looking at your screen
+- Fast workout creation: simple workflow for custom interval sessions
+- Automatic voice cues: verbal guidance for each phase transition
+- Mobile-first experience: designed for running and walking on phone screens
+- Local-first approach: no sign-up required and your data stays on your device
+- Flexible for different levels: great for beginners and more advanced interval routines
 
-## Fitur utama
+## Key features
 
-- Membuat dan mengedit latihan interval custom
-- Atur urutan langkah seperti pemanasan, lari, jalan, istirahat, cooldown
-- Support grup berulang untuk pola seperti run/walk cycle
-- Simpan beberapa preset di localStorage
-- Tes audio dan volume sebelum mulai latihan
-- Player dengan timer, status fase, sisa waktu, dan kontrol cepat
-- Desain responsif untuk pengalaman mobile yang nyaman
-- Cocok untuk lari santai, joging, dan latihan interval ringan
+- Create and edit custom interval workouts
+- Configure sequences like warm-up, run, walk, rest, and cooldown
+- Support repeat groups for run/walk cycle patterns
+- Save multiple presets in localStorage
+- Test audio and volume before starting a session
+- Workout player with timer, phase status, remaining time, and quick controls
+- Responsive UI for comfortable mobile usage
+- Suitable for easy jogging, running, and light interval training
 
-## Demo
+## Demo flow
 
-Berikut alur dasar penggunaan:
+A simple usage flow looks like this:
 
-1. Buat latihan baru
-2. Atur urutan langkah dan durasi
-3. Simpan preset
-4. Tes suara dan bunyi
-5. Mulai sesi
-6. Fokus pada latihan, bukan jam tangan
+1. Create a new workout
+2. Set the step order and durations
+3. Save your preset
+4. Test voice and sound
+5. Start the session
+6. Stay in motion without watching the clock
 
-## Stack teknologi
+## Tech stack
 
 - Next.js 16
 - React 19
 - TypeScript
 - Tailwind CSS
-- LocalStorage untuk data lokal
+- LocalStorage for local data persistence
 
-## Instalasi
+## Installation
 
-Clone repository:
+Clone the repository:
 
 ```bash
 git clone https://github.com/rezkyrevansyah/runcue.git
@@ -71,22 +75,22 @@ npm install
 npm run dev
 ```
 
-Buka http://localhost:3000 untuk melihat aplikasi.
+Open http://localhost:3000 to view the app.
 
-## Menjalankan aplikasi
+## Run the app
 
 ```bash
 npm run dev
 ```
 
-Untuk build produksi:
+For production build:
 
 ```bash
 npm run build
 npm run start
 ```
 
-## Struktur proyek
+## Project structure
 
 ```text
 .
@@ -111,44 +115,44 @@ npm run start
 
 ## Roadmap
 
-- [ ] Uji audio yang lebih stabil di perangkat mobile
-- [ ] Integrasi mode latihan yang lebih kaya
-- [ ] Eksport/import preset
-- [ ] Peningkatan UI/UX untuk onboarding
-- [ ] Dukungan tema gelap/terang lebih eksplisit
-- [ ] Pengalaman interaksi yang lebih kuat untuk runner advanced
+- [ ] Improve audio reliability on mobile devices
+- [ ] Add richer workout modes
+- [ ] Add export/import for presets
+- [ ] Improve onboarding and UX flow
+- [ ] Add better dark/light theme support
+- [ ] Strengthen interactions for advanced runners
 
-## Kontribusi
+## Contributing
 
-Kontribusi sangat terbuka. Jika Anda ingin membantu:
+Contributions are welcome. If you want to help:
 
-1. Fork repository ini
-2. Buat branch baru: `git checkout -b feature/nama-fiturnya`
-3. Commit perubahan: `git commit -m "Add some feature"`
-4. Push ke GitHub: `git push origin feature/nama-fiturnya`
-5. Buka pull request
+1. Fork this repository
+2. Create a new branch: `git checkout -b feature/your-feature-name`
+3. Commit your changes: `git commit -m "Add some feature"`
+4. Push to GitHub: `git push origin feature/your-feature-name`
+5. Open a pull request
 
-Silakan lihat [CONTRIBUTING.md](CONTRIBUTING.md) untuk panduan lengkapnya.
+Please see [CONTRIBUTING.md](CONTRIBUTING.md) for the full contribution guide.
 
-## Lisensi
+## License
 
-Proyek ini dilisensikan di bawah MIT License. Lihat [LICENSE](LICENSE) untuk detail lengkap.
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.
 
-## Tips agar project ini lebih banyak bintang di GitHub
+## Tips to get more GitHub stars
 
-Untuk menarik lebih banyak stars, fokus pada hal berikut:
+If you want this project to attract more stars, focus on the following:
 
-- Buat README yang jelas dan langsung menjelaskan manfaat produk
-- Tampilkan demo singkat atau video layar yang menunjukkan workflow penggunaan
-- Gunakan visual yang menarik: logo, banner, screenshot, mockup, atau GIF
-- Pastikan repo terlihat aktif: commit teratur, issue terjawab, PR berkelanjutan
-- Tulis solusi yang unik: project ini bukan sekadar template, tapi produk yang punya use case nyata
-- Bagikan di komunitas seperti r/nextjs, r/webdev, r/fitness, dan grup teknologi lokal
-- Tambahkan badge status, install guide, roadmap, dan contribution guide
+- Write a clear README that explains the real value immediately
+- Show a short demo or screen recording of the workflow
+- Use strong visuals like logos, banners, screenshots, mockups, or GIFs
+- Keep the repository looking active with regular commits and issue updates
+- Highlight the unique value proposition: this is not just a template, it solves a real problem
+- Share it in communities such as r/nextjs, r/webdev, r/fitness, and local developer groups
+- Add badges, install instructions, roadmap, and contribution guide
 
 ## Status
 
-RunCue masih dalam tahap pengembangan aktif sebagai aplikasi web mobile-first untuk latihan interval. Ini adalah proyek yang bagus untuk portfolio, eksperimen fitur, dan pengembangan produk nyata yang bisa terus dikembangkan.
+RunCue is still in active development as a mobile-first web app for interval training. It is a strong project for portfolio work, feature experiments, and product ideas that can continue to evolve.
 
 <p align="center">
   <a href="https://github.com/rezkyrevansyah/runcue">
