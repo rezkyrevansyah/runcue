@@ -76,7 +76,7 @@ export function HomeView({
           <div className="flex items-center gap-2">
             <div className="w-6 h-6 relative shrink-0">
               <Image
-                src="/logo/logo_runcue_transparant_onlylogonowording.png"
+                src="/logo/logo_runcue_transparant_onlylogonowording.svg"
                 alt="RunCue"
                 width={24}
                 height={24}
@@ -103,8 +103,14 @@ export function HomeView({
       {!isInstalled && !bannerDismissed && (
         <div className="flex items-center justify-between p-3 sm:p-3.5 rounded-2xl bg-[#18181B] border border-[#D6FE3E]/30 shadow-lg animate-in fade-in-50">
           <div className="flex items-center gap-3 min-w-0 pr-2">
-            <div className="w-8 h-8 rounded-xl bg-[#D6FE3E] text-[#111108] flex items-center justify-center shrink-0">
-              <Download className="w-4 h-4 stroke-[2.5]" />
+            <div className="w-9 h-9 rounded-xl bg-[#232327] border border-[#2B2B30] flex items-center justify-center p-1.5 shrink-0">
+              <Image
+                src="/logo/logo_runcue_transparant_onlylogonowording.svg"
+                alt="RunCue Logo"
+                width={24}
+                height={24}
+                className="w-full h-full object-contain"
+              />
             </div>
             <div className="flex flex-col min-w-0">
               <span className="font-bold text-xs text-[#F5F5F7]">

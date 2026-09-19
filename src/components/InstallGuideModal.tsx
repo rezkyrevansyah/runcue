@@ -1,7 +1,8 @@
 'use client';
 
 import React from 'react';
-import { Download, X } from 'lucide-react';
+import Image from 'next/image';
+import { X } from 'lucide-react';
 import { usePwaInstall } from '@/hooks/usePwaInstall';
 
 interface InstallGuideModalProps {
@@ -15,9 +16,20 @@ export function InstallGuideModal({ onClose }: InstallGuideModalProps) {
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in-50">
       <div className="w-full max-w-sm bg-[#18181B] rounded-3xl p-6 shadow-2xl border border-[#2B2B30] flex flex-col gap-4 animate-in zoom-in-95">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2.5">
-            <Download className="w-5 h-5 text-[#D6FE3E]" />
-            <h3 className="text-base font-black text-[#F5F5F7]">Install to Home Screen</h3>
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[#232327] border border-[#2B2B30] flex items-center justify-center p-2 shrink-0 shadow-sm">
+              <Image
+                src="/logo/logo_runcue_transparant_onlylogonowording.svg"
+                alt="RunCue App Icon"
+                width={28}
+                height={28}
+                className="w-full h-full object-contain"
+              />
+            </div>
+            <div className="flex flex-col">
+              <h3 className="text-base font-black text-[#F5F5F7] leading-tight">Install to Home Screen</h3>
+              <span className="text-[11px] text-[#9B9BA3] font-medium">Add RunCue to phone</span>
+            </div>
           </div>
           <button
             type="button"

@@ -13,7 +13,7 @@ export function Header() {
         <div className="flex items-center gap-3">
           <div className="relative flex items-center justify-center w-11 h-11 rounded-2xl bg-slate-950 border border-slate-800 shadow-2xs overflow-hidden shrink-0">
             <Image
-              src="/logo/logo_runcue_transparant_onlylogonowording.png"
+              src="/logo/logo_runcue_transparant_onlylogonowording.svg"
               alt="RunCue Logo"
               width={36}
               height={36}
@@ -48,7 +48,7 @@ export function Header() {
               <div className="flex items-center gap-2.5">
                 <div className="flex items-center justify-center w-9 h-9 rounded-xl bg-slate-950 border border-slate-800 overflow-hidden shrink-0">
                   <Image
-                    src="/logo/logo_runcue_transparant_onlylogonowording.png"
+                    src="/logo/logo_runcue_transparant_onlylogonowording.svg"
                     alt="RunCue Logo"
                     width={28}
                     height={28}

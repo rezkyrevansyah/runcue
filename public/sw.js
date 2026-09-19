@@ -1,5 +1,5 @@
-// RunCue Service Worker v1
-const CACHE_NAME = 'runcue-cache-v1';
+// RunCue Service Worker v3
+const CACHE_NAME = 'runcue-cache-v3';
 
 const STATIC_ASSETS = [
   '/',
@@ -7,9 +7,11 @@ const STATIC_ASSETS = [
   '/icon-192x192.png',
   '/icon-512x512.png',
   '/apple-touch-icon.png',
+  '/favicon.ico',
   '/favicon-32x32.png',
+  '/favicon-16x16.png',
+  '/logo/logo_runcue_transparant_onlylogonowording.svg',
   '/logo/logo_runcue_transparant_onlylogonowording.png',
-  '/logo/logo_runcue_blackbg_onlylogonowording.png',
   '/logo/logo_runcue_blackbg_onlylogonowording.svg'
 ];
 
