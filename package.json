@@ -2,6 +2,27 @@
   "name": "runcue",
   "version": "0.1.0",
   "private": true,
+  "description": "RunCue is a mobile-first interval training app for runners and walkers. Build custom run/walk routines, get voice cues, and stay focused on movement.",
+  "author": "rezkyrevansyah",
+  "homepage": "https://github.com/rezkyrevansyah/runcue#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rezkyrevansyah/runcue.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rezkyrevansyah/runcue/issues"
+  },
+  "keywords": [
+    "running",
+    "fitness",
+    "interval-training",
+    "workout",
+    "run-walk",
+    "nextjs",
+    "typescript",
+    "mobile-app",
+    "health"
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -9,6 +30,7 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "lucide-react": "^1.47.0",
     "next": "16.3.5",
     "react": "19.2.8",
     "react-dom": "19.2.8"

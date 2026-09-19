@@ -1,26 +1,52 @@
 @import "tailwindcss";
 
+@theme {
+  --color-bg: #0A0A0B;
+  --color-surface: #18181B;
+  --color-surface-alt: #232327;
+  --color-border: #2B2B30;
+  --color-text-primary: #F5F5F7;
+  --color-text-secondary: #9B9BA3;
+  --color-text-tertiary: #67676F;
+  --color-accent: #D6FE3E;
+  --color-accent-ink: #111108;
+  --color-type-warmup: #FFB020;
+  --color-type-run: #CFFF04;
+  --color-type-walk: #5B9CFF;
+  --color-type-cooldown: #37D6C4;
+  --color-type-rest: #8A8A92;
+  --color-type-custom: #FF6AC2;
+  --color-danger: #FF5A52;
+}
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #0A0A0B;
+  --foreground: #F5F5F7;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+html, body {
+  background-color: #0A0A0B;
+  color: #F5F5F7;
+  min-height: 100%;
+  font-family: var(--font-sans), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* Tabular numbers for timer digits */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Hide spin buttons on number inputs across all browsers */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }
+input[type=number] {
+  -moz-appearance: textfield;
+  appearance: textfield;
+}
+
+
