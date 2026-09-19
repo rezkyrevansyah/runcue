@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Image from 'next/image';
 import { Workout } from '@/types/workout';
 import { calculateTotalDuration, expandWorkout } from '@/lib/timer-engine';
@@ -42,7 +42,48 @@ export function HomeView({
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
   const [bannerDismissed, setBannerDismissed] = useState(false);
   const [showInstallGuide, setShowInstallGuide] = useState(false);
+  const [bookmarkedId, setBookmarkedId] = useState<string | null>(null);
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const toastTimerRef = useRef<NodeJS.Timeout | null>(null);
   const { isInstalled, hasNativePrompt, triggerInstall } = usePwaInstall();
+
+  // Load bookmarked workout from localStorage
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('runcue_bookmarked_workout_id');
+      if (saved) {
+        setBookmarkedId(saved);
+      }
+    } catch {
+      // Ignore localStorage errors
+    }
+  }, []);
+
+  const showToast = (msg: string) => {
+    if (toastTimerRef.current) clearTimeout(toastTimerRef.current);
+    setToastMessage(msg);
+    toastTimerRef.current = setTimeout(() => {
+      setToastMessage(null);
+    }, 2400);
+  };
+
+  const handleToggleBookmark = (id: string, e?: React.MouseEvent) => {
+    if (e) e.stopPropagation();
+    if (bookmarkedId === id) {
+      setBookmarkedId(null);
+      try {
+        localStorage.removeItem('runcue_bookmarked_workout_id');
+      } catch {}
+      showToast('Removed from Featured');
+    } else {
+      setBookmarkedId(id);
+      try {
+        localStorage.setItem('runcue_bookmarked_workout_id', id);
+      } catch {}
+      const target = workouts.find(w => w.id === id);
+      showToast(target ? `"${target.name}" set as Featured` : 'Set as Featured Workout');
+    }
+  };
 
   const handleInstallClick = async () => {
     if (hasNativePrompt) {
@@ -52,9 +93,22 @@ export function HomeView({
     }
   };
 
-  const defaultWorkout = workouts[0];
-  const defaultTotalSec = defaultWorkout ? calculateTotalDuration(defaultWorkout) : 0;
-  const defaultExpanded = defaultWorkout ? expandWorkout(defaultWorkout) : [];
+  const featuredWorkout = (bookmarkedId && workouts.find(w => w.id === bookmarkedId)) || workouts[0];
+  const isFeaturedBookmarked = Boolean(featuredWorkout && bookmarkedId === featuredWorkout.id);
+  const featuredTotalSec = featuredWorkout ? calculateTotalDuration(featuredWorkout) : 0;
+  const featuredExpanded = featuredWorkout ? expandWorkout(featuredWorkout) : [];
+  const featuredRounds = featuredWorkout
+    ? featuredWorkout.blocks.reduce((acc, b) => (b.kind === 'repeat' ? acc + b.count : acc), 0) || 1
+    : 0;
+
+  const getFeaturedSummary = (w: Workout, expanded: ReturnType<typeof expandWorkout>) => {
+    if (expanded.length === 0) return 'Custom interval sequence';
+    const preview = expanded
+      .slice(0, 3)
+      .map(s => `${s.label} ${formatTimeMMSS(s.durationSeconds)}`)
+      .join(' → ');
+    return expanded.length > 3 ? `${preview} → ...` : preview;
+  };
 
   // Determine an appropriate icon for each preset based on its name/steps
   const getPresetIcon = (name: string, index: number) => {
@@ -142,7 +196,7 @@ export function HomeView({
       )}
 
       {/* Featured Card (FEATURED WORKOUT) */}
-      {defaultWorkout && (
+      {featuredWorkout && (
         <section className="flex flex-col gap-4 p-5 sm:p-6 rounded-3xl bg-[#232327] border border-[#2B2B30] shadow-xl">
           <div className="flex items-center justify-between">
             <div className="px-3 py-1 rounded-full bg-[#D6FE3E] text-[#111108] text-[11px] font-black tracking-wider uppercase">
@@ -150,19 +204,24 @@ export function HomeView({
             </div>
             <button
               type="button"
-              className="text-[#9B9BA3] hover:text-[#F5F5F7] transition cursor-pointer"
-              title="Bookmark"
+              onClick={e => handleToggleBookmark(featuredWorkout.id, e)}
+              className={`p-2 rounded-xl transition cursor-pointer active:scale-90 ${
+                isFeaturedBookmarked
+                  ? 'text-[#D6FE3E] bg-[#D6FE3E]/15 border border-[#D6FE3E]/30'
+                  : 'text-[#9B9BA3] hover:text-[#F5F5F7] hover:bg-[#18181B]'
+              }`}
+              title={isFeaturedBookmarked ? 'Unpin from Featured' : 'Pin as Featured'}
             >
-              <Bookmark className="w-4 h-4" />
+              <Bookmark className={`w-4 h-4 ${isFeaturedBookmarked ? 'fill-current' : ''}`} />
             </button>
           </div>
 
           <div className="flex flex-col gap-1">
             <h2 className="text-xl font-black text-[#F5F5F7] tracking-tight">
-              {defaultWorkout.name}
+              {featuredWorkout.name}
             </h2>
             <p className="text-xs text-[#9B9BA3] line-clamp-1 leading-relaxed">
-              Warmup 5:00 → Run 1:00 / Walk 2:00 × 8 → Cooldown 5:00
+              {getFeaturedSummary(featuredWorkout, featuredExpanded)}
             </p>
           </div>
 
@@ -170,19 +229,19 @@ export function HomeView({
           <div className="grid grid-cols-3 gap-2 py-1 border-y border-[#2B2B30]/80">
             <div className="flex flex-col py-1.5">
               <span className="text-lg font-black text-[#F5F5F7] tabular-nums">
-                {formatTimeMMSS(defaultTotalSec)}
+                {formatTimeMMSS(featuredTotalSec)}
               </span>
               <span className="text-[11px] font-medium text-[#9B9BA3]">Total</span>
             </div>
             <div className="flex flex-col py-1.5">
               <span className="text-lg font-black text-[#F5F5F7] tabular-nums">
-                {defaultExpanded.length}
+                {featuredExpanded.length}
               </span>
               <span className="text-[11px] font-medium text-[#9B9BA3]">Stages</span>
             </div>
             <div className="flex flex-col py-1.5">
               <span className="text-lg font-black text-[#F5F5F7]">
-                × 8
+                × {featuredRounds}
               </span>
               <span className="text-[11px] font-medium text-[#9B9BA3]">Rounds</span>
             </div>
@@ -191,7 +250,7 @@ export function HomeView({
           {/* PrimaryButton Start This Workout */}
           <button
             type="button"
-            onClick={() => onSelectWorkout(defaultWorkout)}
+            onClick={() => onSelectWorkout(featuredWorkout)}
             className="w-full h-13 rounded-full bg-[#D6FE3E] hover:bg-[#c9f62c] active:scale-[0.98] text-[#111108] font-black text-sm tracking-wide flex items-center justify-center gap-2 shadow-lg shadow-[#D6FE3E]/15 transition cursor-pointer select-none"
           >
             <Play className="w-4 h-4 fill-current ml-0.5" />
@@ -226,6 +285,7 @@ export function HomeView({
               const totalSec = calculateTotalDuration(w);
               const exp = expandWorkout(w);
               const { Icon, color } = getPresetIcon(w.name, idx);
+              const isBookmarked = bookmarkedId === w.id;
 
               return (
                 <div
@@ -253,6 +313,18 @@ export function HomeView({
 
                   {/* Actions & Play Button */}
                   <div className="flex items-center gap-1 shrink-0">
+                    <button
+                      type="button"
+                      onClick={e => handleToggleBookmark(w.id, e)}
+                      className={`w-8 h-8 rounded-xl flex items-center justify-center transition cursor-pointer active:scale-90 ${
+                        isBookmarked
+                          ? 'text-[#D6FE3E] bg-[#D6FE3E]/15'
+                          : 'text-[#67676F] hover:text-[#F5F5F7] hover:bg-[#232327]'
+                      }`}
+                      title={isBookmarked ? 'Unpin from Featured' : 'Pin to Featured'}
+                    >
+                      <Bookmark className={`w-3.5 h-3.5 ${isBookmarked ? 'fill-current' : ''}`} />
+                    </button>
                     <button
                       type="button"
                       onClick={() => onDuplicateWorkout(w)}
@@ -294,6 +366,14 @@ export function HomeView({
           </div>
         )}
       </section>
+
+      {/* Floating Toast Notification */}
+      {toastMessage && (
+        <div className="fixed bottom-22 left-1/2 -translate-x-1/2 z-50 px-4 py-2 rounded-full bg-[#18181B]/95 backdrop-blur-md border border-[#D6FE3E]/40 text-xs font-semibold text-[#F5F5F7] shadow-2xl flex items-center gap-2 animate-in fade-in-50 slide-in-from-bottom-2 duration-150 pointer-events-none">
+          <Bookmark className="w-3.5 h-3.5 text-[#D6FE3E] fill-current shrink-0" />
+          <span className="truncate max-w-xs">{toastMessage}</span>
+        </div>
+      )}
 
       {/* Delete Confirmation Modal */}
       {deleteConfirmId && (

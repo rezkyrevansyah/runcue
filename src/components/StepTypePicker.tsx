@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { ChevronDown, Flame, Zap, Footprints, Wind, Coffee, Sliders, Check } from 'lucide-react';
 import { StepType } from '@/types/workout';
 import { STEP_TYPE_CONFIG } from '@/lib/constants';
@@ -24,30 +25,77 @@ const TYPE_OPTIONS: StepType[] = ['warmup', 'run', 'walk', 'cooldown', 'rest', '
 
 export function StepTypePicker({ value, onChange, size = 'md' }: StepTypePickerProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const [coords, setCoords] = useState<{ top: number; left: number } | null>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
 
   const currentConfig = STEP_TYPE_CONFIG[value] || STEP_TYPE_CONFIG.run;
 
+  const updateCoords = () => {
+    if (buttonRef.current) {
+      const rect = buttonRef.current.getBoundingClientRect();
+      const menuHeight = 260;
+      const spaceBelow = window.innerHeight - rect.bottom;
+      
+      const top = spaceBelow < menuHeight && rect.top > menuHeight
+        ? rect.top - menuHeight - 6
+        : rect.bottom + 6;
+
+      const left = Math.max(10, Math.min(rect.left, window.innerWidth - 220));
+      setCoords({ top, left });
+    }
+  };
+
+  const handleToggle = () => {
+    if (!isOpen) {
+      updateCoords();
+      setIsOpen(true);
+    } else {
+      setIsOpen(false);
+    }
+  };
+
   useEffect(() => {
-    function handleClickOutside(event: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+    function handleClickOutside(event: MouseEvent | TouchEvent) {
+      const target = event.target as Node;
+      if (
+        menuRef.current &&
+        !menuRef.current.contains(target) &&
+        buttonRef.current &&
+        !buttonRef.current.contains(target)
+      ) {
         setIsOpen(false);
       }
     }
+
+    function handleScrollOrResize() {
+      if (isOpen) {
+        updateCoords();
+      }
+    }
+
     if (isOpen) {
       document.addEventListener('mousedown', handleClickOutside);
+      document.addEventListener('touchstart', handleClickOutside);
+      window.addEventListener('scroll', handleScrollOrResize, true);
+      window.addEventListener('resize', handleScrollOrResize);
     }
+
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+      window.removeEventListener('scroll', handleScrollOrResize, true);
+      window.removeEventListener('resize', handleScrollOrResize);
     };
   }, [isOpen]);
 
   return (
-    <div className="relative inline-block text-left" ref={containerRef}>
+    <div className="relative inline-block text-left">
       {/* Trigger Button */}
       <button
+        ref={buttonRef}
         type="button"
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={handleToggle}
         className={`inline-flex items-center gap-1.5 font-bold transition-all duration-150 cursor-pointer active:scale-95 select-none rounded-xl border border-black/5 shadow-2xs hover:shadow-xs ${
           size === 'sm' ? 'px-2.5 py-1 text-2xs' : 'px-3 py-1.5 text-xs'
         } ${currentConfig.badgeBg} ${currentConfig.badgeColor}`}
@@ -61,14 +109,21 @@ export function StepTypePicker({ value, onChange, size = 'md' }: StepTypePickerP
         />
       </button>
 
-      {/* Floating Dropdown Menu */}
-      {isOpen && (
+      {/* Floating Dropdown Menu Portaled to document.body */}
+      {isOpen && coords && typeof document !== 'undefined' && createPortal(
         <div
-          className="absolute left-0 top-full mt-1.5 z-50 min-w-[190px] rounded-2xl bg-[#18181B] p-1.5 shadow-2xl border border-[#2B2B30] flex flex-col gap-0.5 animate-in fade-in-50 zoom-in-95 duration-100"
+          ref={menuRef}
+          style={{
+            position: 'fixed',
+            top: `${coords.top}px`,
+            left: `${coords.left}px`,
+            zIndex: 9999,
+          }}
+          className="w-52 rounded-2xl bg-[#18181B] p-1.5 shadow-2xl border border-[#2B2B30] flex flex-col gap-0.5 animate-in fade-in-50 zoom-in-95 duration-100"
           role="listbox"
         >
           <div className="px-2.5 py-1 text-[10px] font-bold tracking-wider uppercase text-[#67676F]">
-            Pilih Jenis Langkah
+            Select Stage Type
           </div>
           {TYPE_OPTIONS.map(opt => {
             const optConfig = STEP_TYPE_CONFIG[opt];
@@ -102,7 +157,8 @@ export function StepTypePicker({ value, onChange, size = 'md' }: StepTypePickerP
               </button>
             );
           })}
-        </div>
+        </div>,
+        document.body
       )}
     </div>
   );

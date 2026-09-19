@@ -17,12 +17,6 @@ import {
   ListOrdered,
   AlertCircle,
   Clock,
-  Zap,
-  Footprints,
-  Flame,
-  Wind,
-  Coffee,
-  Sliders,
 } from 'lucide-react';
 
 interface EditorViewProps {
@@ -31,15 +25,6 @@ interface EditorViewProps {
   onStart: (workout: Workout) => void;
   onBack: () => void;
 }
-
-const STEP_ICONS: Record<StepType, React.ComponentType<{ className?: string; style?: React.CSSProperties }>> = {
-  warmup: Flame,
-  run: Zap,
-  walk: Footprints,
-  cooldown: Wind,
-  rest: Coffee,
-  custom: Sliders,
-};
 
 export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps) {
   const [currentWorkout, setCurrentWorkout] = useState<Workout>(workout);
@@ -339,44 +324,45 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
           if (block.kind === 'step') {
             const step = block as Step;
             const cfg = STEP_TYPE_CONFIG[step.type] || STEP_TYPE_CONFIG.run;
-            const StepIcon = STEP_ICONS[step.type] || Zap;
 
             return (
               <div
                 key={step.id}
-                className="relative flex items-center justify-between p-3.5 sm:p-4 rounded-2xl bg-[#18181B] border border-[#2B2B30] pl-5 overflow-hidden group"
+                className="relative flex flex-col gap-2.5 p-3.5 sm:p-4 rounded-2xl bg-[#18181B] border border-[#2B2B30] pl-5 group shadow-xs transition-colors hover:border-[#3E3E45]"
               >
                 {/* Accent Bar on Left */}
                 <div
-                  className="absolute left-0 top-0 bottom-0 w-1.5"
+                  className="absolute left-0 top-0 bottom-0 w-1.5 rounded-l-2xl"
                   style={{ backgroundColor: cfg.accentColor }}
                 />
 
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-9 h-9 rounded-full bg-[#232327] flex items-center justify-center shrink-0">
-                    <StepIcon className="w-4 h-4" style={{ color: cfg.accentColor }} />
-                  </div>
+                {/* Top Row: Type Picker + Quick Adjust Duration */}
+                <div className="flex items-center justify-between gap-2">
+                  <StepTypePicker
+                    value={step.type}
+                    onChange={t =>
+                      handleUpdateStep(step.id, {
+                        type: t,
+                        label: STEP_TYPE_CONFIG[t].label,
+                      })
+                    }
+                    size="md"
+                  />
 
-                  <div className="flex flex-col min-w-0">
-                    <StepTypePicker
-                      value={step.type}
-                      onChange={t =>
+                  {/* Duration Controller: [-] [input] sec [+] */}
+                  <div className="flex items-center rounded-xl bg-[#232327] border border-[#2B2B30] p-0.5">
+                    <button
+                      type="button"
+                      onClick={() =>
                         handleUpdateStep(step.id, {
-                          type: t,
-                          label: STEP_TYPE_CONFIG[t].label,
+                          durationSeconds: Math.max(5, step.durationSeconds - 15),
                         })
                       }
-                      size="sm"
-                    />
-                    <span className="text-[11px] text-[#67676F] mt-0.5">
-                      Single stage
-                    </span>
-                  </div>
-                </div>
-
-                {/* Duration & Actions */}
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center rounded-xl bg-[#232327] border border-[#2B2B30] px-2.5 py-1">
+                      className="w-7 h-7 rounded-lg flex items-center justify-center text-[#9B9BA3] hover:text-[#F5F5F7] hover:bg-[#2B2B30] text-sm font-bold transition active:scale-95 cursor-pointer"
+                      title="Subtract 15 seconds"
+                    >
+                      -
+                    </button>
                     <input
                       type="number"
                       min={5}
@@ -389,17 +375,38 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
                           durationSeconds: isNaN(val) ? 0 : Math.max(0, Math.min(val, 7200)),
                         });
                       }}
-                      className="w-12 bg-transparent text-right font-black text-sm text-[#F5F5F7] tabular-nums focus:outline-none"
+                      className="w-12 bg-transparent text-center font-black text-sm text-[#F5F5F7] tabular-nums focus:outline-none"
                     />
-                    <span className="text-[11px] text-[#9B9BA3] font-bold ml-1">sec</span>
+                    <span className="text-[11px] text-[#9B9BA3] font-bold pr-1 select-none">sec</span>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleUpdateStep(step.id, {
+                          durationSeconds: Math.min(7200, step.durationSeconds + 15),
+                        })
+                      }
+                      className="w-7 h-7 rounded-lg flex items-center justify-center text-[#9B9BA3] hover:text-[#F5F5F7] hover:bg-[#2B2B30] text-sm font-bold transition active:scale-95 cursor-pointer"
+                      title="Add 15 seconds"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+
+                {/* Bottom Row: Stage Info + Action Buttons */}
+                <div className="flex items-center justify-between pt-1 border-t border-[#232327]">
+                  <div className="flex items-center gap-1.5 text-xs text-[#9B9BA3]">
+                    <span className="font-semibold text-[#F5F5F7]">Stage {index + 1}</span>
+                    <span>·</span>
+                    <span className="tabular-nums font-medium">{formatTimeMMSS(step.durationSeconds)}</span>
                   </div>
 
-                  <div className="flex items-center gap-0.5">
+                  <div className="flex items-center gap-1">
                     <button
                       type="button"
                       onClick={() => handleMoveBlock(index, 'up')}
                       disabled={index === 0}
-                      className="p-1 rounded-lg text-[#67676F] hover:text-[#F5F5F7] hover:bg-[#232327] disabled:opacity-20 cursor-pointer"
+                      className="w-7 h-7 rounded-lg flex items-center justify-center text-[#67676F] hover:text-[#F5F5F7] hover:bg-[#232327] disabled:opacity-20 cursor-pointer transition"
                       title="Move Up"
                     >
                       <ArrowUp className="w-3.5 h-3.5" />
@@ -408,7 +415,7 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
                       type="button"
                       onClick={() => handleMoveBlock(index, 'down')}
                       disabled={index === currentWorkout.blocks.length - 1}
-                      className="p-1 rounded-lg text-[#67676F] hover:text-[#F5F5F7] hover:bg-[#232327] disabled:opacity-20 cursor-pointer"
+                      className="w-7 h-7 rounded-lg flex items-center justify-center text-[#67676F] hover:text-[#F5F5F7] hover:bg-[#232327] disabled:opacity-20 cursor-pointer transition"
                       title="Move Down"
                     >
                       <ArrowDown className="w-3.5 h-3.5" />
@@ -416,7 +423,7 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
                     <button
                       type="button"
                       onClick={() => handleDuplicateBlock(index)}
-                      className="p-1 rounded-lg text-[#67676F] hover:text-[#F5F5F7] hover:bg-[#232327] cursor-pointer"
+                      className="w-7 h-7 rounded-lg flex items-center justify-center text-[#67676F] hover:text-[#F5F5F7] hover:bg-[#232327] cursor-pointer transition"
                       title="Duplicate"
                     >
                       <Copy className="w-3.5 h-3.5" />
@@ -424,7 +431,7 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
                     <button
                       type="button"
                       onClick={() => handleDeleteBlock(index)}
-                      className="p-1 rounded-lg text-[#67676F] hover:text-[#FF5A52] hover:bg-[#232327] cursor-pointer"
+                      className="w-7 h-7 rounded-lg flex items-center justify-center text-[#67676F] hover:text-[#FF5A52] hover:bg-[#232327] cursor-pointer transition"
                       title="Delete"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -441,32 +448,39 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
             return (
               <div
                 key={rg.id}
-                className="flex flex-col gap-3 p-4 rounded-2xl bg-[#232327] border border-[#2B2B30]"
+                className="flex flex-col gap-3 p-4 rounded-2xl bg-[#232327] border border-[#2B2B30] shadow-xs"
               >
                 {/* Repeat Group Header */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Repeat className="w-4 h-4 text-[#D6FE3E]" />
-                    <span className="text-sm font-bold text-[#F5F5F7]">Repeat Group</span>
+                    <div className="w-7 h-7 rounded-lg bg-[#D6FE3E]/10 border border-[#D6FE3E]/20 flex items-center justify-center text-[#D6FE3E]">
+                      <Repeat className="w-3.5 h-3.5" />
+                    </div>
+                    <div>
+                      <div className="text-sm font-bold text-[#F5F5F7]">Repeat Group</div>
+                      <div className="text-[11px] text-[#9B9BA3]">{rg.steps.length} intervals</div>
+                    </div>
                   </div>
 
                   <div className="flex items-center gap-2">
                     {/* Count Badge Controls */}
-                    <div className="flex items-center rounded-full bg-[#0A0A0B] border border-[#2B2B30] px-2 py-0.5">
+                    <div className="flex items-center rounded-xl bg-[#18181B] border border-[#2B2B30] p-0.5">
                       <button
                         type="button"
                         onClick={() => handleUpdateRepeatCount(rg.id, -1)}
-                        className="w-5 h-5 rounded-full flex items-center justify-center text-[#9B9BA3] hover:text-[#F5F5F7] font-bold cursor-pointer"
+                        className="w-6 h-6 rounded-md flex items-center justify-center text-[#9B9BA3] hover:text-[#F5F5F7] hover:bg-[#232327] text-xs font-bold transition active:scale-95 cursor-pointer"
+                        title="Decrease rounds"
                       >
                         -
                       </button>
-                      <span className="px-2 text-xs font-black text-[#D6FE3E] tabular-nums">
+                      <span className="px-2 text-xs font-black text-[#D6FE3E] tabular-nums select-none">
                         × {rg.count}
                       </span>
                       <button
                         type="button"
                         onClick={() => handleUpdateRepeatCount(rg.id, 1)}
-                        className="w-5 h-5 rounded-full flex items-center justify-center text-[#9B9BA3] hover:text-[#F5F5F7] font-bold cursor-pointer"
+                        className="w-6 h-6 rounded-md flex items-center justify-center text-[#9B9BA3] hover:text-[#F5F5F7] hover:bg-[#232327] text-xs font-bold transition active:scale-95 cursor-pointer"
+                        title="Increase rounds"
                       >
                         +
                       </button>
@@ -477,7 +491,7 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
                         type="button"
                         onClick={() => handleMoveBlock(index, 'up')}
                         disabled={index === 0}
-                        className="p-1 rounded-lg text-[#67676F] hover:text-[#F5F5F7] hover:bg-[#18181B] disabled:opacity-20 cursor-pointer"
+                        className="w-7 h-7 rounded-lg flex items-center justify-center text-[#67676F] hover:text-[#F5F5F7] hover:bg-[#18181B] disabled:opacity-20 cursor-pointer transition"
                         title="Move Up"
                       >
                         <ArrowUp className="w-3.5 h-3.5" />
@@ -486,7 +500,7 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
                         type="button"
                         onClick={() => handleMoveBlock(index, 'down')}
                         disabled={index === currentWorkout.blocks.length - 1}
-                        className="p-1 rounded-lg text-[#67676F] hover:text-[#F5F5F7] hover:bg-[#18181B] disabled:opacity-20 cursor-pointer"
+                        className="w-7 h-7 rounded-lg flex items-center justify-center text-[#67676F] hover:text-[#F5F5F7] hover:bg-[#18181B] disabled:opacity-20 cursor-pointer transition"
                         title="Move Down"
                       >
                         <ArrowDown className="w-3.5 h-3.5" />
@@ -494,7 +508,7 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
                       <button
                         type="button"
                         onClick={() => handleDuplicateBlock(index)}
-                        className="p-1 rounded-lg text-[#67676F] hover:text-[#F5F5F7] hover:bg-[#18181B] cursor-pointer"
+                        className="w-7 h-7 rounded-lg flex items-center justify-center text-[#67676F] hover:text-[#F5F5F7] hover:bg-[#18181B] cursor-pointer transition"
                         title="Duplicate"
                       >
                         <Copy className="w-3.5 h-3.5" />
@@ -502,7 +516,7 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
                       <button
                         type="button"
                         onClick={() => handleDeleteBlock(index)}
-                        className="p-1 rounded-lg text-[#67676F] hover:text-[#FF5A52] hover:bg-[#18181B] cursor-pointer"
+                        className="w-7 h-7 rounded-lg flex items-center justify-center text-[#67676F] hover:text-[#FF5A52] hover:bg-[#18181B] cursor-pointer transition"
                         title="Delete"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -515,22 +529,19 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
                 <div className="flex flex-col gap-2">
                   {rg.steps.map((subStep, subIdx) => {
                     const cfg = STEP_TYPE_CONFIG[subStep.type] || STEP_TYPE_CONFIG.run;
-                    const SubIcon = STEP_ICONS[subStep.type] || Zap;
 
                     return (
                       <div
                         key={subStep.id}
-                        className="relative flex items-center justify-between p-3 rounded-xl bg-[#18181B] border border-[#2B2B30] pl-4 overflow-hidden"
+                        className="relative flex flex-col gap-2 p-3 rounded-xl bg-[#18181B] border border-[#2B2B30] pl-4 group transition-colors hover:border-[#3E3E45]"
                       >
                         <div
-                          className="absolute left-0 top-0 bottom-0 w-1.5"
+                          className="absolute left-0 top-0 bottom-0 w-1.5 rounded-l-xl"
                           style={{ backgroundColor: cfg.accentColor }}
                         />
 
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <div className="w-8 h-8 rounded-full bg-[#232327] flex items-center justify-center shrink-0">
-                            <SubIcon className="w-3.5 h-3.5" style={{ color: cfg.accentColor }} />
-                          </div>
+                        {/* Substep Top Row: Picker + Duration Controller */}
+                        <div className="flex items-center justify-between gap-2">
                           <StepTypePicker
                             value={subStep.type}
                             onChange={t =>
@@ -542,10 +553,24 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
                             }
                             size="sm"
                           />
-                        </div>
 
-                        <div className="flex items-center gap-2">
-                          <div className="flex items-center rounded-xl bg-[#232327] border border-[#2B2B30] px-2 py-0.5">
+                          <div className="flex items-center rounded-lg bg-[#232327] border border-[#2B2B30] p-0.5">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleUpdateStep(
+                                  rg.id,
+                                  {
+                                    durationSeconds: Math.max(5, subStep.durationSeconds - 15),
+                                  },
+                                  subStep.id
+                                )
+                              }
+                              className="w-6 h-6 rounded flex items-center justify-center text-[#9B9BA3] hover:text-[#F5F5F7] hover:bg-[#2B2B30] text-xs font-bold transition active:scale-95 cursor-pointer"
+                              title="Subtract 15 seconds"
+                            >
+                              -
+                            </button>
                             <input
                               type="number"
                               min={5}
@@ -564,9 +589,34 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
                                   subStep.id
                                 );
                               }}
-                              className="w-10 bg-transparent text-right font-black text-xs text-[#F5F5F7] tabular-nums focus:outline-none"
+                              className="w-10 bg-transparent text-center font-black text-xs text-[#F5F5F7] tabular-nums focus:outline-none"
                             />
-                            <span className="text-[10px] text-[#9B9BA3] font-bold ml-1">sec</span>
+                            <span className="text-[10px] text-[#9B9BA3] font-bold pr-1 select-none">sec</span>
+                            <button
+                              type="button"
+                              onClick={() =>
+                                handleUpdateStep(
+                                  rg.id,
+                                  {
+                                    durationSeconds: Math.min(7200, subStep.durationSeconds + 15),
+                                  },
+                                  subStep.id
+                                )
+                              }
+                              className="w-6 h-6 rounded flex items-center justify-center text-[#9B9BA3] hover:text-[#F5F5F7] hover:bg-[#2B2B30] text-xs font-bold transition active:scale-95 cursor-pointer"
+                              title="Add 15 seconds"
+                            >
+                              +
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Substep Bottom Row: Interval index + actions */}
+                        <div className="flex items-center justify-between pt-1 border-t border-[#232327]">
+                          <div className="flex items-center gap-1.5 text-[11px] text-[#9B9BA3]">
+                            <span className="font-semibold text-[#F5F5F7]">Step {subIdx + 1}</span>
+                            <span>·</span>
+                            <span className="tabular-nums font-medium">{formatTimeMMSS(subStep.durationSeconds)}</span>
                           </div>
 
                           {rg.steps.length > 1 && (
@@ -575,7 +625,7 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
                                 type="button"
                                 onClick={() => handleMoveSubStep(rg.id, subIdx, 'up')}
                                 disabled={subIdx === 0}
-                                className="p-1 rounded-lg text-[#67676F] hover:text-[#F5F5F7] hover:bg-[#232327] disabled:opacity-20 cursor-pointer"
+                                className="w-6 h-6 rounded-md flex items-center justify-center text-[#67676F] hover:text-[#F5F5F7] hover:bg-[#232327] disabled:opacity-20 cursor-pointer transition"
                                 title="Move Up"
                               >
                                 <ArrowUp className="w-3 h-3" />
@@ -584,7 +634,7 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
                                 type="button"
                                 onClick={() => handleMoveSubStep(rg.id, subIdx, 'down')}
                                 disabled={subIdx === rg.steps.length - 1}
-                                className="p-1 rounded-lg text-[#67676F] hover:text-[#F5F5F7] hover:bg-[#232327] disabled:opacity-20 cursor-pointer"
+                                className="w-6 h-6 rounded-md flex items-center justify-center text-[#67676F] hover:text-[#F5F5F7] hover:bg-[#232327] disabled:opacity-20 cursor-pointer transition"
                                 title="Move Down"
                               >
                                 <ArrowDown className="w-3 h-3" />
@@ -592,7 +642,7 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
                               <button
                                 type="button"
                                 onClick={() => handleDeleteSubStep(rg.id, subStep.id)}
-                                className="p-1 rounded-lg text-[#67676F] hover:text-[#FF5A52] hover:bg-[#232327] cursor-pointer"
+                                className="w-6 h-6 rounded-md flex items-center justify-center text-[#67676F] hover:text-[#FF5A52] hover:bg-[#232327] cursor-pointer transition"
                                 title="Delete"
                               >
                                 <Trash2 className="w-3 h-3" />
@@ -608,9 +658,9 @@ export function EditorView({ workout, onSave, onStart, onBack }: EditorViewProps
                 <button
                   type="button"
                   onClick={() => handleAddStepToGroup(rg.id)}
-                  className="w-full py-1.5 rounded-xl border border-dashed border-[#2B2B30] hover:border-[#D6FE3E] text-[11px] font-bold text-[#9B9BA3] hover:text-[#F5F5F7] flex items-center justify-center gap-1 transition cursor-pointer"
+                  className="w-full py-2 rounded-xl border border-dashed border-[#2B2B30] hover:border-[#D6FE3E] text-xs font-bold text-[#9B9BA3] hover:text-[#D6FE3E] flex items-center justify-center gap-1.5 transition cursor-pointer active:scale-98"
                 >
-                  <Plus className="w-3 h-3" />
+                  <Plus className="w-3.5 h-3.5" />
                   <span>Add Stage to Group</span>
                 </button>
               </div>
